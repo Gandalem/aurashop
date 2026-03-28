@@ -13,11 +13,10 @@ public class JwtUtil {
     // 암호화 키 (실제 운영 환경에서는 application.yml에 길고 복잡한 문자로 숨겨서 사용해야 합니다)
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    // 토큰 만료 시간 (예: 24시간)
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
-
     // 1. 토큰 생성 메서드
     public String generateToken(String email) {
+        // 토큰 만료 시간 (예: 24시간)
+        long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
         return Jwts.builder()
                 .setSubject(email) // 토큰 내용에 이메일 저장
                 .setIssuedAt(new Date()) // 발행 시간
