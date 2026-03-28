@@ -1,0 +1,219 @@
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: #fff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding: 40px 20px;
+}
+
+.signup-box {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.signup-box h2 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.signup-box p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.input-group input,
+.input-group textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.error-message {
+    color: #d9534f;
+    font-size: 13px;
+    text-align: left;
+    margin-top: -5px;
+}
+
+.signup-btn {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.signup-btn:hover {
+    background-color: #333;
+}
+
+.signup-links {
+    margin-top: 25px;
+    font-size: 13px;
+    color: #666;
+}
+
+.signup-links a {
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 5px;
+    transition: text-decoration 0.3s ease;
+}
+
+.signup-links a:hover {
+    text-decoration: underline;
+}
+.role-selection {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.role-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #888;
+    cursor: pointer;
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.role-label input {
+    display: none; /* 기본 동그라미 라디오 버튼 숨기기 */
+}
+
+/* 선택되었을 때의 디자인 */
+.role-label.active {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+    font-weight: bold;
+}
+
+/* 판매자 전용 입력칸 강조 */
+.highlight-group input {
+    border-color: #000;
+    background-color: #fbfbfb;
+}
+
+/* 주소 입력 필드 스타일 */
+.address-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.address-row {
+    display: flex;
+    gap: 10px;
+}
+
+.zipcode-input {
+    flex: 1;
+    background-color: #f9f9f9;
+}
+
+.search-address-btn {
+    padding: 0 15px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.search-address-btn:hover {
+    background-color: #555;
+}
+
+.main-address-input {
+    background-color: #f9f9f9;
+}
+
+/* 다음 우편번호 모달 (팝업) 스타일 */
+.postcode-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.postcode-modal {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    background-color: #fff;
+    padding: 20px 10px 10px 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.close-postcode-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #333;
+}

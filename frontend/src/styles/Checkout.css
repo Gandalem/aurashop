@@ -1,0 +1,75 @@
+.checkout-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.checkout-container h2 {
+    text-align: center;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+}
+
+.checkout-form {
+    background-color: #fff;
+    padding: 40px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+}
+
+.checkout-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box; /* 패딩이 너비를 넘지 않도록 */
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.submit-order-btn {
+    width: 100%;
+    padding: 16px;
+    margin-top: 20px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-order-btn:hover {
+    background-color: #333;
+}
