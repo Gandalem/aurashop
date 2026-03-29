@@ -50,4 +50,10 @@ public class ProductController {
 
         return ResponseEntity.ok("상품이 성공적으로 등록되었습니다.");
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        Product product = productRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품을 찾을 수 없습니다. ID: " + id));
+        return ResponseEntity.ok(product);
+    }
 }

@@ -21,6 +21,31 @@ const ProductRegister = () => {
             [name]: value
         });
     };
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formDataFile = new FormData(); // 💡 위쪽의 formData 상태와 이름이 겹치지 않게 변경
+        formDataFile.append('file', file);
+
+        const token = localStorage.getItem('token');
+
+        axios.post('http://localhost:8080/api/files/upload', formDataFile, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                alert("사진 업로드 성공! 📸");
+                // 🚨 수정된 부분: setProduct 대신 setFormData 사용!
+                setFormData({ ...formData, imageUrl: res.data });
+            })
+            .catch(err => {
+                console.error(err);
+                alert("사진 업로드 중 오류가 발생했습니다.");
+            });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -102,16 +127,20 @@ const ProductRegister = () => {
                         />
                     </div>
 
-                    <div className="input-group">
-                        <label htmlFor="imageUrl">상품 이미지 URL (Image URL)</label>
+                    <div className="form-group">
+                        <label>상품 이미지 업로드</label>
                         <input
-                            type="text"
-                            id="imageUrl"
-                            name="imageUrl"
-                            value={formData.imageUrl}
-                            onChange={handleChange}
-                            placeholder="이미지 링크를 입력해 주세요 (http://...)"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
                         />
+                        {/* 🚨 수정된 부분: product.imageUrl -> formData.imageUrl */}
+                        {formData.imageUrl && (
+                            <div style={{ marginTop: '10px' }}>
+                                <p style={{ fontSize: '13px', color: 'green' }}>✅ 업로드 완료!</p>
+                                <img src={formData.imageUrl} alt="미리보기" style={{ width: '150px', borderRadius: '8px' }} />
+                            </div>
+                        )}
                     </div>
 
                     <div className="input-group">

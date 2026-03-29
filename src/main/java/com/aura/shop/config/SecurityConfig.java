@@ -4,6 +4,7 @@ import com.aura.shop.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -43,8 +44,12 @@ public class SecurityConfig {
 
                 // 4. 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/products/**").permitAll() // 로그인, 회원가입, 상품조회는 누구나 가능
-                        .anyRequest().authenticated() // 나머지는 토큰이 있어야 접근 가능
+
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/files/**", "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 // 5. JWT 필터를 기본 인증 필터 앞에 추가

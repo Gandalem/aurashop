@@ -50,11 +50,6 @@ const Navigation = () => {
 
                     {isLoggedIn ? (
                         <>
-                            {/* 🌟 판매자(isSeller가 true)일 때만 이 버튼이 화면에 그려집니다! */}
-                            {isSeller && (
-                                <a href="/product/new" className="icon-link">ADD PRODUCT</a>
-                            )}
-
                             <a href="/mypage" className="icon-link">MY PAGE</a>
                             <button onClick={handleLogout} className="logout-btn">SIGN OUT</button>
                         </>

@@ -11,7 +11,10 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import MyPage from './pages/MyPage';
 import SignUp from './pages/SignUp';
-import ProductRegister from './pages/ProductRegister';
+import ProductDetail from './pages/ProductDetail';
+import SellerLogin from './components/SellerLogin.jsx';
+import SellerPage from './components/SellerPage.jsx';
+import Footer from './components/Footer';
 
 // 전체 앱의 전역 CSS (필요하다면)
 import './styles/App.css';
@@ -36,9 +39,12 @@ function App() {
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/mypage" element={<MyPage />} />
                         <Route path="/signup" element={<SignUp />} />
-                        <Route path="/product/new" element={<ProductRegister />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/seller" element={<SellerLogin />} />
+                        <Route path="/seller/dashboard" element={<SellerPage />} />
                     </Routes>
                 </div>
+                <Footer />
             </div>
         </Router>
     );

@@ -1,0 +1,80 @@
+/* 🌟 전체 푸터 스타일 */
+.footer {
+    background-color: #1a1a1a; /* 짙은 그레이 배경 */
+    color: #999; /* 옅은 그레이 글자색 (가독성은 확보하되 튀지 않게) */
+    padding: 40px 20px;
+    margin-top: 60px; /* 메인 콘텐츠와 여백 확보 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    border-top: 1px solid #333; /* 상단 경계선 */
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto; /* 중앙 정렬 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 가로 중앙 정렬 */
+    text-align: center; /* 글자 중앙 정렬 */
+    gap: 25px; /* 각 영역 간 여백 */
+}
+
+/* 🌟 주요 링크 영역 스타일 */
+.footer-links {
+    display: flex;
+    gap: 20px; /* 링크 간 여백 */
+    flex-wrap: wrap; /* 화면 작아지면 자동 줄바꿈 */
+    justify-content: center;
+}
+
+.footer-links a {
+    color: #bbb; /* 기본 링크 색상 */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #ffffff; /* 호버 시 흰색으로 */
+}
+
+/* 🌟 [핵심] 판매자 센터 링크만 약간 특별하게 (하지만 조용히) 디자인 */
+.footer-links .seller-center-link {
+    color: #a5b4fc; /* 약간의 포인트 컬러 (연한 블루 톤) */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 아이콘과 글자 사이 여백 */
+}
+
+.footer-links .seller-center-link:hover {
+    color: #c7d2fe; /* 호버 시 더 밝은 블루 톤 */
+    text-decoration: underline; /* 호버 시 언더라인으로 링크임을 명시 */
+}
+
+/* 🌟 쇼핑몰 정보 영역 스타일 */
+.footer-info p {
+    margin: 5px 0;
+    font-size: 13px;
+    color: #777; /* 더 연한 그레이 색상 */
+}
+
+/* 🌟 카피라이트 영역 스타일 */
+.footer-copyright {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #555; /* 가장 어두운 그레이 색상 */
+}
+
+/* 반응형 모바일 스타일 */
+@media (max-width: 768px) {
+    .footer {
+        padding: 30px 15px;
+    }
+    .footer-links {
+        gap: 10px 15px;
+    }
+    .footer-info p {
+        font-size: 12px;
+    }
+}

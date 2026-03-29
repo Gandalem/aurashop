@@ -1,0 +1,155 @@
+/* 🌟 전체 대시보드 레이아웃 (화면을 양옆으로 나눔) */
+.seller-dashboard {
+    display: flex;
+    min-height: 100vh; /* 화면 전체 높이 사용 */
+    background-color: #f4f6f9; /* 눈이 편안한 아주 옅은 회색 배경 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: -20px; /* 기본 여백 제거 (App.css 설정에 따라 다를 수 있음) */
+}
+
+/* 🌟 좌측 사이드바 (메뉴 영역) */
+.seller-sidebar {
+    width: 260px;
+    background-color: #1e293b; /* 세련된 딥 네이비/블랙 계열 */
+    color: #ffffff;
+    padding-top: 30px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.seller-sidebar h3 {
+    text-align: center;
+    font-size: 22px;
+    letter-spacing: 3px;
+    margin-bottom: 40px;
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.seller-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.seller-sidebar li {
+    padding: 18px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent; /* 선택 시 하이라이트를 위한 투명 선 */
+    color: #cbd5e1;
+}
+
+.seller-sidebar li:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+/* 현재 선택된 메뉴 하이라이트 */
+.seller-sidebar li.active {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: bold;
+    border-left: 4px solid #3b82f6; /* 포인트 컬러 (블루) */
+}
+
+/* 🌟 우측 메인 콘텐츠 영역 */
+.seller-content {
+    flex: 1; /* 남은 화면 전체 사용 */
+    padding: 50px;
+    overflow-y: auto; /* 내용이 길어지면 스크롤 생성 */
+}
+
+/* 콘텐츠를 담는 하얀색 박스 (패널) */
+.seller-panel {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    max-width: 900px;
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+.seller-panel h2 {
+    font-size: 28px;
+    color: #111827;
+    margin-bottom: 10px;
+    margin-top: 0;
+}
+
+.seller-panel p {
+    color: #64748b;
+    margin-bottom: 30px;
+    font-size: 15px;
+}
+
+/* 🌟 상품 등록 폼 디자인 */
+.seller-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.form-group-row {
+    display: flex;
+    gap: 30px;
+}
+
+.seller-form label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #334155;
+}
+
+.seller-form input,
+.seller-form textarea {
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.seller-form input:focus,
+.seller-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6; /* 포커스 시 블루 컬러 */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submit-product-btn {
+    margin-top: 15px;
+    padding: 18px;
+    background-color: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-product-btn:hover {
+    background-color: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.submit-product-btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

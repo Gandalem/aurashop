@@ -37,8 +37,8 @@ public class AuthController {
         user.setAddress(request.address());
         user.setPhone(request.phone());
 
-        // 🌟 2. 권한 및 사업자 번호 저장 로직 추가
-        if (request.role() != null && request.role().equals("SELLER")) {
+        // 🌟 오직 판매자와 일반 회원만 가입 가능! (ADMIN은 가입 불가)
+        if ("SELLER".equals(request.role())) {
             user.setRole("SELLER");
             user.setBusinessNumber(request.businessNumber());
         } else {
@@ -46,6 +46,7 @@ public class AuthController {
         }
 
         userRepository.save(user);
+
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
@@ -61,10 +62,10 @@ public class AuthController {
             return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
         }
 
-        // 3. 토큰 생성
+        // 3. 토큰 생성 (jwtUtil 방식에 맞게)
         String token = jwtUtil.generateToken(user.getEmail());
 
-        // 🌟 4. 토큰과 함께 사용자의 권한(Role)도 같이 묶어서 반환합니다!
+        // 🌟 4. [핵심] AuthResponse를 사용해서 '토큰'과 '권한(role)'을 같이 묶어서 리액트로 보내줍니다!
         return ResponseEntity.ok(new AuthResponse(token, user.getRole()));
     }
 }

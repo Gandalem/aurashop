@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/ProductList.css';
+import { useNavigate } from 'react-router-dom';
 
 const ProductList = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -53,7 +55,10 @@ const ProductList = () => {
 
             <div className="product-grid">
                 {products.map(product => (
-                    <div key={product.id} className="product-card">
+                    <div key={product.id} key={product.id}
+                         className="product-card"
+                         onClick={() => navigate(`/product/${product.id}`)}
+                         style={{ cursor: 'pointer' }}>
                         <div className="image-placeholder">
                             {product.imageUrl ? (
                                 <img src={product.imageUrl} alt={product.name} />
