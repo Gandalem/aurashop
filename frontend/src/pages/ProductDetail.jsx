@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import '../styles/ProductDetail.css'; // CSS 파일 연결
 
 const ProductDetail = () => {
@@ -11,7 +11,7 @@ const ProductDetail = () => {
 
     useEffect(() => {
         // 백엔드에 특정 상품 데이터 1개만 요청
-        axios.get(`http://localhost:8080/api/products/${id}`)
+        api.get(`http://localhost:8080/api/products/${id}`)
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);
@@ -37,7 +37,7 @@ const ProductDetail = () => {
 
             <div className="product-detail-info">
                 <h2>{product.name}</h2>
-                <p className="price">${product.price.toFixed(2)}</p>
+                <p className="price">{product.price.toFixed(2)}원</p>
 
                 <div className="description">
                     {/* 상품 설명이 없으면 기본 문구 출력 */}

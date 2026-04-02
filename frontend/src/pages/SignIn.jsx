@@ -19,10 +19,8 @@ const SignIn = () => {
             password: password})
             .then(response => {
                 // 1. 토큰 저장
-                localStorage.setItem('token', response.data.token);
-
-                // 2. 🌟 백엔드에서 받은 권한(role)도 저장! (이 줄이 핵심입니다)
-                localStorage.setItem('role', response.data.role);
+                localStorage.setItem('accessToken', response.data.accessToken);
+                localStorage.setItem('role', response.data.role);;
 
                 alert("로그인 성공!");
                 window.location.href = '/'; // 메인 화면으로 이동

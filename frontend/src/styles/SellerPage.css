@@ -153,3 +153,47 @@
     transform: none;
     box-shadow: none;
 }
+/* ================= 👇 여기서부터 추가 👇 ================= */
+/* 🌟 주문 관리 테이블 스타일 */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.order-table th, .order-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.order-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #334155;
+}
+
+.order-table tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* 🌟 상태 변경 드롭다운(Select) 스타일 */
+.status-select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    appearance: none;
+    outline: none;
+}
+
+.status-paid { background-color: #fee2e2; color: #ef4444; } /* PENDING */
+.status-shipping { background-color: #fef08a; color: #ca8a04; } /* SHIPPED */
+.status-done { background-color: #dcfce3; color: #22c55e; } /* DELIVERED */
+/* ================= 👆 여기까지 추가 👆 ================= */

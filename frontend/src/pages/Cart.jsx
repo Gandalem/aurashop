@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import '../styles/Cart.css';
 
 const Cart = () => {
@@ -9,14 +9,14 @@ const Cart = () => {
 
     // 🌟 백엔드에서 내 장바구니 목록 가져오기
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (!token) {
             alert("로그인이 필요합니다.");
             window.location.href = '/signin';
             return;
         }
 
-        axios.get('http://localhost:8080/api/cart', {
+        api.get('http://localhost:8080/api/cart', {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(response => {
@@ -31,8 +31,8 @@ const Cart = () => {
 
     // 🌟 삭제 기능도 API 연동 (앞서 백엔드에 만들어둔 DELETE API 호출)
     const handleRemove = (id) => {
-        const token = localStorage.getItem('token');
-        axios.delete(`http://localhost:8080/api/cart/${id}`, {
+        const token = localStorage.getItem('accessToken');
+        api.delete(`http://localhost:8080/api/cart/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios';
+import api from '../api';
 import '../styles/SellerPage.css'; // 어드민 스타일 공유
 
 const SellerLogin = () => {
@@ -8,7 +8,7 @@ const SellerLogin = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         const role = localStorage.getItem('role');
 
         if (token && role === 'SELLER') {
@@ -19,7 +19,7 @@ const SellerLogin = () => {
     const handleSellerLogin = (e) => {
         e.preventDefault();
 
-        axios.post('http://localhost:8080/api/auth/login', {
+        api.post('http://localhost:8080/api/auth/login', {
             email: email,
             password: password
         })
@@ -31,7 +31,7 @@ const SellerLogin = () => {
                 }
 
                 // 진짜 판매자면 로컬 스토리지에 저장하고 판매자 대시보드로 이동
-                localStorage.setItem('token', res.data.token);
+                localStorage.setItem('accessToken', res.data.token);
                 localStorage.setItem('role', res.data.role);
 
                 alert("사장님, 환영합니다! 대박나세요! 💸");

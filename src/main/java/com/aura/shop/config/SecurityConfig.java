@@ -44,10 +44,16 @@ public class SecurityConfig {
 
                 // 4. 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        // 🌟 1. 리액트의 찌르기(OPTIONS) 요청을 보안 필터 없이 무조건 통과!
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/files/**", "/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+
+                        // 🌟 2. DB에 권한이 SELLER, ROLE_SELLER 무엇으로 저장되어 있든 다 통과!
+                        .requestMatchers("/api/orders/seller", "/api/orders/*/status").hasAuthority("SELLER")
+
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )

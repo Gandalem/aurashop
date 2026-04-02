@@ -10,38 +10,53 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 암호화 키 (실제 운영 환경에서는 application.yml에 길고 복잡한 문자로 숨겨서 사용해야 합니다)
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    // 1. 토큰 생성 메서드
-    public String generateToken(String email) {
-        // 토큰 만료 시간 (예: 24시간)
-        long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
+    // 👇 (추가) 1. Access Token 생성 (수명: 30분)
+    // 👇 파라미터에 String role 추가!
+    public String generateAccessToken(String email, String role) {
+        long EXPIRATION_TIME = 1000 * 60 * 30; // 30분
         return Jwts.builder()
-                .setSubject(email) // 토큰 내용에 이메일 저장
-                .setIssuedAt(new Date()) // 발행 시간
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
-                .signWith(key) // 비밀 키로 서명 (위변조 방지)
+                .setSubject(email)
+                .claim("role", role) // 🌟 핵심! 이 명찰을 빼먹었었습니다 ㅠㅠ
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key)
                 .compact();
     }
 
-    // 2. 토큰에서 이메일 추출 메서드
+    // 👇 (추가) 2. Refresh Token 생성 (수명: 14일)
+    public String generateRefreshToken(String email) {
+        long EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; // 14일 (L을 꼭 붙여야 오버플로우가 안 납니다!)
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key)
+                .compact();
+    }
+
+    // 2. 토큰에서 이메일 추출 메서드 (기존과 동일)
     public String getEmailFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+    }
+
+    // 🌟 3. (새로 추가) 토큰에서 직급(Role)을 꺼내는 메서드!
+    public String getRoleFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .getSubject();
+                .get("role", String.class); // 아까 넣었던 "role"을 그대로 꺼냅니다.
     }
 
-    // 3. 토큰 유효성 검증 메서드
+    // 4. 토큰 유효성 검증 메서드 (기존과 동일)
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            // 토큰이 조작되었거나, 만료되었을 경우 false 반환
             return false;
         }
     }

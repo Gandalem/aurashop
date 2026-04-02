@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import '../styles/ProductList.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/products')
+        api.get('http://localhost:8080/api/products')
             .then(response => {
                 setProducts(response.data);
                 setLoading(false);
@@ -22,7 +22,7 @@ const ProductList = () => {
 
     // 🌟 장바구니 담기 API 호출 함수
     const handleAddToCart = (productId) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
         if (!token) {
             alert("로그인이 필요한 서비스입니다.");
@@ -30,7 +30,7 @@ const ProductList = () => {
             return;
         }
 
-        axios.post('http://localhost:8080/api/cart',
+        api.post('http://localhost:8080/api/cart',
             { productId: productId, quantity: 1 }, // 1개씩 담기
             { headers: { Authorization: `Bearer ${token}` } } // 🔑 토큰 필수!
         )
@@ -68,7 +68,7 @@ const ProductList = () => {
                         </div>
                         <div className="product-info">
                             <h3>{product.name}</h3>
-                            <p className="price">${product.price.toFixed(2)}</p>
+                            <p className="price">{product.price.toFixed(2)}원</p>
                             {/* 🌟 버튼에 onClick 이벤트 연결 */}
                             <button
                                 className="add-to-cart-btn"

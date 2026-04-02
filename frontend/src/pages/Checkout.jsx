@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import '../styles/Checkout.css';
 
 const Checkout = () => {
@@ -13,10 +13,10 @@ const Checkout = () => {
 
     // 🌟 컴포넌트가 켜질 때 장바구니 데이터를 불러와서 총 금액 계산하기
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (token) {
             // 장바구니 목록을 불러오는 API (기존에 만드셨던 주소에 맞게 확인해주세요!)
-            axios.get('http://localhost:8080/api/cart', {
+            api.get('http://localhost:8080/api/cart', {
                 headers: { Authorization: `Bearer ${token}` }
             })
                 .then(res => {
@@ -59,7 +59,7 @@ const Checkout = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (!token) {
             alert("로그인이 필요한 서비스입니다.");
             window.location.href = '/signin';
@@ -96,7 +96,7 @@ const Checkout = () => {
         IMP.request_pay(data, (response) => {
             if (response.success) {
                 // 🌟 2. 결제가 성공하면 비로소 백엔드로 주문 생성 요청 보내기
-                axios.post('http://localhost:8080/api/orders',
+                api.post('http://localhost:8080/api/orders',
                     {
                         shippingAddress: shippingAddress
                     },

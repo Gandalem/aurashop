@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import '../styles/ProductRegister.css';
 
 const ProductRegister = () => {
@@ -28,9 +28,9 @@ const ProductRegister = () => {
         const formDataFile = new FormData(); // 💡 위쪽의 formData 상태와 이름이 겹치지 않게 변경
         formDataFile.append('file', file);
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
-        axios.post('http://localhost:8080/api/files/upload', formDataFile, {
+        api.post('http://localhost:8080/api/files/upload', formDataFile, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${token}`
@@ -52,7 +52,7 @@ const ProductRegister = () => {
         setLoading(true);
         setError(null);
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (!token) {
             alert("로그인이 필요한 서비스입니다.");
             window.location.href = '/signin';
@@ -60,7 +60,7 @@ const ProductRegister = () => {
         }
 
         // 백엔드의 상품 등록 API 호출 (판매자 권한이 있는 토큰만 통과될 것입니다)
-        axios.post('http://localhost:8080/api/products', formData, {
+        api.post('http://localhost:8080/api/products', formData, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

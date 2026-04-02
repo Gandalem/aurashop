@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../styles/Mypage.css'; // 디자인 적용을 위한 CSS 파일
+import api from '../api';
+import '../styles/Mypage.css';
 
 const MyPage = () => {
     const [orders, setOrders] = useState([]);
@@ -8,17 +8,18 @@ const MyPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // 1. 로컬 스토리지에 저장된 JWT 토큰 가져오기 (로그인 시 저장했다고 가정)
-        const token = localStorage.getItem('token');
+        // 🚨 1. 수정됨: 'token' 대신 'accessToken'을 꺼내오도록 변경!
+        const token = localStorage.getItem('accessToken');
 
         if (!token) {
-            setError("로그인이 필요한 서비스입니다.");
-            setLoading(false);
-            return;
+            setError("로그인이 필요한 서비스입니다."); //
+            setLoading(false); //
+            return; //
         }
 
-        // 2. 백엔드 API 호출 (헤더에 토큰 포함)
-        axios.get('http://localhost:8080/api/orders', {
+        // 🚨 2. 수정됨: api.js에서 이미 'http://localhost:8080/api'를 기본 주소로
+        // 설정해두었기 때문에 '/orders'만 적어주면 됩니다!
+        api.get('/orders', {
             headers: {
                 Authorization: `Bearer ${token}`
             }

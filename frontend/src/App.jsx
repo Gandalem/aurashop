@@ -15,25 +15,19 @@ import ProductDetail from './pages/ProductDetail';
 import SellerLogin from './components/SellerLogin.jsx';
 import SellerPage from './components/SellerPage.jsx';
 import Footer from './components/Footer';
+import CustomerCenter from './pages/CustomerCenter';
 
-// 전체 앱의 전역 CSS (필요하다면)
+// 전체 앱의 전역 CSS
 import './styles/App.css';
 
 function App() {
     return (
-        // Router가 앱 전체를 감싸야 주소 이동이 가능합니다.
         <Router>
             <div className="App">
-                {/* Navigation은 Routes 밖에 두어 항상 화면 상단에 보이게 합니다. */}
                 <Navigation />
-
-                {/* 메인 콘텐츠 영역 (주소에 따라 바뀌는 부분) */}
                 <div className="main-content">
                     <Routes>
-                        {/* 기본 주소('/')로 접속하면 상품 목록 화면을 보여줍니다. */}
                         <Route path="/" element={<ProductList />} />
-
-                        {/* 각 주소에 맞는 페이지 컴포넌트를 연결합니다. */}
                         <Route path="/signin" element={<SignIn />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/checkout" element={<Checkout />} />
@@ -42,6 +36,7 @@ function App() {
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/seller" element={<SellerLogin />} />
                         <Route path="/seller/dashboard" element={<SellerPage />} />
+                        <Route path="/cs" element={<CustomerCenter />} />
                     </Routes>
                 </div>
                 <Footer />
@@ -50,4 +45,4 @@ function App() {
     );
 }
 
-export default App;
+export default App; // 👈 App.jsx에는 이것만 남아야 정상입니다!

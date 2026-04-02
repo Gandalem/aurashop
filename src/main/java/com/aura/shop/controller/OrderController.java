@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class OrderController {
 
     private final OrderRepository orderRepository;
@@ -93,5 +93,29 @@ public class OrderController {
         User user = getCurrentUser();
         List<Order> myOrders = orderRepository.findByUserOrderByOrderDateDesc(user);
         return ResponseEntity.ok(myOrders);
+    }
+
+    // 🚚 판매자용 1: 모든 고객의 주문 목록 전체 조회 API
+    @GetMapping("/seller") // 👈 2. 이 코드가 반드시 있어야 함!
+    public ResponseEntity<?> getAllOrdersForSeller() {
+        List<Order> allOrders = orderRepository.findAll();
+        return ResponseEntity.ok(allOrders);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer id, @RequestBody java.util.Map<String, String> request) {
+
+        // 1. 수정할 주문 번호 찾기
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+
+        // 2. 리액트에서 보낸 새로운 상태값(PENDING, SHIPPED 등) 꺼내기
+        String newStatus = request.get("status");
+
+        // 3. 상태 업데이트 후 DB에 저장
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+
+        return ResponseEntity.ok("주문 상태가 [" + newStatus + "](으)로 변경되었습니다.");
     }
 }
