@@ -54,6 +54,10 @@ public class SecurityConfig {
                         // 🌟 2. DB에 권한이 SELLER, ROLE_SELLER 무엇으로 저장되어 있든 다 통과!
                         .requestMatchers("/api/orders/seller", "/api/orders/*/status").hasAuthority("SELLER")
 
+                        // 👈 누구나 공지와 질문 목록을 '볼 수' 있게 허용!
+                        .requestMatchers(HttpMethod.GET, "/api/notices", "/api/qna").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )

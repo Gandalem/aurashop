@@ -29,6 +29,10 @@ public class Question {
     @Column(nullable = false)
     private String status; // 예: "대기중", "답변완료"
 
+    // 🌟 여기 추가! 관리자가 작성할 답변을 저장할 공간입니다.
+    @Column(columnDefinition = "TEXT")
+    private String answer;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

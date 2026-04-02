@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import DaumPostcode from 'react-daum-postcode'; // 🌟 다음 주소 API 임포트
+import DaumPostcode from 'react-daum-postcode'; // 다음 주소 API 임포트
 import '../styles/SignUp.css';
 
 const SignUp = () => {
+    // 🌟 1. role과 businessNumber 상태 제거
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         name: '',
-        phone: '',
-        role: 'USER',
-        businessNumber: ''
+        phone: ''
     });
 
-    // 🌟 주소 관련 상태를 따로 관리 (우편번호, 기본주소, 상세주소)
     const [addressObj, setAddressObj] = useState({
         zonecode: '',
         mainAddress: '',
         detailAddress: ''
     });
 
-    // 주소 검색 팝업창 열기/닫기 상태
     const [isOpenPost, setIsOpenPost] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -35,11 +32,8 @@ const SignUp = () => {
         setAddressObj({ ...addressObj, [name]: value });
     };
 
-    const handleRoleChange = (e) => {
-        setFormData({ ...formData, role: e.target.value, businessNumber: '' });
-    };
+    // 🌟 2. handleRoleChange 함수 삭제됨
 
-    // 🌟 다음 주소 검색 완료 시 실행되는 함수
     const handleComplete = (data) => {
         let fullAddress = data.address;
         let extraAddress = '';
@@ -56,10 +50,10 @@ const SignUp = () => {
 
         setAddressObj({
             ...addressObj,
-            zonecode: data.zonecode, // 우편번호
-            mainAddress: fullAddress // 기본주소
+            zonecode: data.zonecode,
+            mainAddress: fullAddress
         });
-        setIsOpenPost(false); // 검색 완료 후 팝업 닫기
+        setIsOpenPost(false);
     };
 
     const handleSubmit = (e) => {
@@ -67,13 +61,13 @@ const SignUp = () => {
         setLoading(true);
         setError(null);
 
-        // 🌟 분리되어 있던 주소를 하나로 합쳐서 백엔드에 보낼 준비
         const finalAddress = `[${addressObj.zonecode}] ${addressObj.mainAddress} ${addressObj.detailAddress}`.trim();
         const submitData = { ...formData, address: finalAddress };
 
         axios.post('http://localhost:8080/api/auth/signup', submitData)
             .then(response => {
-                alert(submitData.role === 'SELLER' ? "판매자 회원가입이 완료되었습니다!" : "회원가입이 완료되었습니다!");
+                // 🌟 3. 알림 메시지 단순화
+                alert("회원가입이 완료되었습니다!");
                 window.location.href = '/signin';
             })
             .catch(err => {
@@ -90,16 +84,8 @@ const SignUp = () => {
                 <h2>CREATE ACCOUNT</h2>
 
                 <form onSubmit={handleSubmit} className="signup-form">
-                    <div className="role-selection">
-                        <label className={`role-label ${formData.role === 'USER' ? 'active' : ''}`}>
-                            <input type="radio" name="role" value="USER" checked={formData.role === 'USER'} onChange={handleRoleChange} />
-                            일반 구매자
-                        </label>
-                        <label className={`role-label ${formData.role === 'SELLER' ? 'active' : ''}`}>
-                            <input type="radio" name="role" value="SELLER" checked={formData.role === 'SELLER'} onChange={handleRoleChange} />
-                            판매자 (Seller)
-                        </label>
-                    </div>
+
+                    {/* 🌟 4. 구매자/판매자 선택 라디오 버튼 삭제됨 */}
 
                     <div className="input-group">
                         <label htmlFor="email">Email *</label>
@@ -112,25 +98,21 @@ const SignUp = () => {
                     </div>
 
                     <div className="input-group">
-                        <label htmlFor="name">{formData.role === 'SELLER' ? '상호명 *' : 'Name *'}</label>
+                        {/* 🌟 5. 상호명 라벨을 Name으로 고정 */}
+                        <label htmlFor="name">Name *</label>
                         <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
                     </div>
 
-                    {formData.role === 'SELLER' && (
-                        <div className="input-group highlight-group">
-                            <label htmlFor="businessNumber">사업자 등록번호 *</label>
-                            <input type="text" id="businessNumber" name="businessNumber" value={formData.businessNumber} onChange={handleChange} required={formData.role === 'SELLER'} />
-                        </div>
-                    )}
+                    {/* 🌟 6. 사업자 등록번호 입력란 삭제됨 */}
 
                     <div className="input-group">
                         <label htmlFor="phone">Phone</label>
                         <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} />
                     </div>
 
-                    {/* 🌟 다음 주소 API 적용 영역 */}
                     <div className="input-group address-group">
-                        <label>{formData.role === 'SELLER' ? '사업장 주소' : 'Address'}</label>
+                        {/* 🌟 7. 사업장 주소 라벨을 Address로 고정 */}
+                        <label>Address</label>
 
                         <div className="address-row">
                             <input type="text" placeholder="우편번호" value={addressObj.zonecode} readOnly className="zipcode-input" />
@@ -151,7 +133,6 @@ const SignUp = () => {
                         />
                     </div>
 
-                    {/* 🌟 주소 검색 팝업 (모달) */}
                     {isOpenPost && (
                         <div className="postcode-modal-overlay">
                             <div className="postcode-modal">

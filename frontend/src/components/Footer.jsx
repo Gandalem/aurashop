@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../styles/Footer.css';
 
 const Footer = () => {
-    // 🌟 핵심: 현재 브라우저에 저장된 사용자의 권한(role)을 확인합니다!
+    // 🌟 현재 브라우저에 저장된 사용자의 권한(role)을 확인합니다
     const role = localStorage.getItem('role');
 
     return (
@@ -13,14 +13,10 @@ const Footer = () => {
                     <a href="#!">이용약관</a>
                     <a href="#!">개인정보처리방침</a>
 
-                    {/* 🌟 똑똑한 분기 처리: 판매자냐 아니냐에 따라 다른 버튼 보여주기! */}
-                    {role === 'SELLER' ? (
+                    {/* 🌟 일반 손님에겐 아예 안 보이고, 사장님(SELLER) 계정으로 로그인했을 때만 대시보드 링크가 뜹니다! */}
+                    {role === 'SELLER' && (
                         <Link to="/seller/dashboard" className="seller-center-link">
-                            🏪 내 판매자 대시보드
-                        </Link>
-                    ) : (
-                        <Link to="/seller" className="seller-center-link">
-                            🏪 판매자 센터 (입점신청)
+                            🏪 관리자 대시보드
                         </Link>
                     )}
                 </div>
