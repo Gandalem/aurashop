@@ -1,50 +1,71 @@
-import React, { useState } from 'react';
-// import api from '../api'; // 나중에 백엔드 연결할 때 주석 해제!
+import React, { useState, useEffect } from 'react';
+import api from '../api'; // 🌟 1. 주석 해제! 우리의 똑똑한 통신 도구를 불러옵니다.
 
 const CustomerCenter = () => {
     const [activeTab, setActiveTab] = useState('notice');
-
-    // 🌟 팝업창을 띄우고 닫기 위한 상태
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // 🌟 새 질문의 제목과 내용을 담을 상태
     const [newQuestion, setNewQuestion] = useState({ title: '', content: '' });
 
-    // 임시 공지사항 데이터
+    // 임시 공지사항 데이터 (이건 나중에 백엔드 붙여도 됨!)
     const notices = [
         { id: 1, title: '[필독] 반품 및 환불 규정 안내', date: '2026-04-01' },
         { id: 2, title: '봄맞이 신상품 입고 및 배송 지연 안내', date: '2026-03-28' },
     ];
 
-    // 🌟 Q&A 데이터를 useState로 변경! (새 질문을 배열에 추가해서 화면에 보여주기 위해)
-    const [qnas, setQnas] = useState([
-        { id: 1, title: '배송은 얼마나 걸리나요?', author: '홍*동', status: '답변완료' },
-        { id: 2, title: '사이즈 교환하고 싶습니다.', author: '김*수', status: '대기중' },
-    ]);
+    // 🌟 2. Q&A 목록을 빈 배열로 시작합니다! (백엔드에서 가져올 거니까요)
+    const [qnas, setQnas] = useState([]);
 
-    // 질문 등록 버튼 눌렀을 때 실행될 함수
+    // 🌟 3. 백엔드 DB에서 질문 목록을 가져오는 함수
+    const fetchQuestions = () => {
+        api.get('/qna')
+            .then(response => {
+                setQnas(response.data); // 백엔드에서 준 진짜 데이터를 state에 쏙!
+            })
+            .catch(error => {
+                console.error("질문 목록을 불러오는 중 에러 발생:", error);
+            });
+    };
+
+    // 🌟 4. 이 화면이 처음 켜질 때, 질문 목록을 딱 한 번 가져옵니다.
+    useEffect(() => {
+        fetchQuestions();
+    }, []);
+
+    // 🌟 5. 질문 등록 버튼을 눌렀을 때 실행되는 함수 (진짜 통신!)
     const handleSubmit = (e) => {
-        e.preventDefault(); // 새로고침 방지
+        e.preventDefault();
 
         if (!newQuestion.title || !newQuestion.content) {
             alert('제목과 내용을 모두 입력해주세요!');
             return;
         }
 
-        // 💡 나중에는 여기서 api.post('/qna', newQuestion) 를 해서 백엔드로 보낼 겁니다!
+        // 로컬 스토리지에 저장된 이름이 있으면 쓰고, 없으면 '익명 사용자'
+        const authorName = localStorage.getItem('userName') || '익명 사용자';
 
-        // 지금은 화면에만 임시로 추가해볼게요.
-        const fakeNewQna = {
-            id: qnas.length + 1,
+        // 🚀 백엔드로 데이터를 쏩니다!
+        api.post('/qna', {
             title: newQuestion.title,
-            author: '나*용', // 실제로는 로그인한 유저 이름이 들어가야 함!
-            status: '대기중'
-        };
+            content: newQuestion.content,
+            author: authorName
+        })
+            .then(response => {
+                alert(response.data); // 백엔드가 보낸 "질문이 성공적으로 등록되었습니다."
+                setIsModalOpen(false); // 팝업 닫기
+                setNewQuestion({ title: '', content: '' }); // 입력칸 비우기
+                fetchQuestions(); // 🌟 핵심: DB에 저장됐으니 목록을 다시 갱신해서 화면에 띄움!
+            })
+            .catch(error => {
+                console.error("질문 등록 실패:", error);
+                alert("질문 등록에 실패했습니다. 로그인이 되어있는지 확인해주세요.");
+            });
+    };
 
-        setQnas([fakeNewQna, ...qnas]); // 새 질문을 맨 위에 추가!
-        setIsModalOpen(false); // 팝업 닫기
-        setNewQuestion({ title: '', content: '' }); // 입력칸 비우기
-        alert('질문이 성공적으로 등록되었습니다!');
+    // 🌟 날짜 예쁘게 보여주는 함수 추가 (백엔드에서 주는 createdAt 용)
+    const formatDate = (dateString) => {
+        if(!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR');
     };
 
     return (
@@ -79,11 +100,10 @@ const CustomerCenter = () => {
                 </ul>
             )}
 
-            {/* Q&A 내용 */}
+            {/* Q&A 내용 (DB 연동 버전) */}
             {activeTab === 'qna' && (
                 <div>
                     <div style={{ textAlign: 'right', marginBottom: '10px' }}>
-                        {/* 🌟 팝업 열기 버튼! */}
                         <button
                             onClick={() => setIsModalOpen(true)}
                             style={{ padding: '10px 20px', background: '#333', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
@@ -92,22 +112,29 @@ const CustomerCenter = () => {
                         </button>
                     </div>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
-                        {qnas.map(qna => (
-                            <li key={qna.id} style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between' }}>
-                                <span>❓ {qna.title}</span>
-                                <div style={{ color: '#888', fontSize: '14px' }}>
-                                    <span style={{ marginRight: '15px' }}>작성자: {qna.author}</span>
-                                    <span style={{ color: qna.status === '답변완료' ? 'green' : 'orange', fontWeight: 'bold' }}>
-                                        [{qna.status}]
-                                    </span>
-                                </div>
-                            </li>
-                        ))}
+                        {qnas.length === 0 ? (
+                            <li style={{ padding: '30px', textAlign: 'center', color: '#888' }}>아직 등록된 질문이 없습니다.</li>
+                        ) : (
+                            qnas.map(qna => (
+                                <li key={qna.id} style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ fontWeight: 'bold' }}>❓ {qna.title}</span>
+                                        <span style={{ color: qna.status === '답변완료' ? 'green' : 'orange', fontWeight: 'bold' }}>
+                                            [{qna.status}]
+                                        </span>
+                                    </div>
+                                    <div style={{ color: '#888', fontSize: '13px', display: 'flex', gap: '15px' }}>
+                                        <span>작성자: {qna.author}</span>
+                                        <span>작성일: {formatDate(qna.createdAt)}</span>
+                                    </div>
+                                </li>
+                            ))
+                        )}
                     </ul>
                 </div>
             )}
 
-            {/* 🌟 질문 등록 팝업창 (Modal) */}
+            {/* 질문 등록 팝업창 (Modal) */}
             {isModalOpen && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
