@@ -27,7 +27,7 @@ public class CartController {
 
     // 리액트와 데이터를 주고받을 DTO
     public record CartAddRequest(Integer productId, Integer quantity) {}
-    public record CartResponse(Integer id, Integer productId, String name, BigDecimal price, String imageUrl, Integer quantity) {}
+    public record CartResponse(Integer id, Integer productId, String name, BigDecimal price, List<String> imageUrl, Integer quantity) {}
 
     // 🔑 현재 로그인한 사용자 정보를 가져오는 공통 메서드
     private User getCurrentUser() {
@@ -48,7 +48,7 @@ public class CartController {
                         cart.getProduct().getId(),
                         cart.getProduct().getName(),
                         cart.getProduct().getPrice(),
-                        cart.getProduct().getImageUrl(),
+                        cart.getProduct().getImageUrls(),
                         cart.getQuantity()
                 )).toList();
     }

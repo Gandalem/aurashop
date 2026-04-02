@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -18,65 +17,65 @@ public class ProductController {
 
     private final ProductRepository productRepository;
 
-    // 🌟 1. 프론트엔드에서 보낸 상품 데이터를 담을 그릇 (DTO) 생성
+    // 🌟 1. DTO에서 String imageUrl -> List<String> imageUrls 로 변경
     public record ProductRequest(
-            Integer categoryId, // 🌟 카테고리 ID 추가!
+            Integer categoryId,
             String name,
             Double price,
             Integer stockQuantity,
             String description,
-            String imageUrl
+            List<String> imageUrls // 여러 장의 이미지를 받기 위해 List로 변경!
     ) {}
 
-    // 🌟 GET: 전체 또는 카테고리별 상품 조회로 변경!
+    // 🌟 GET: 전체 또는 카테고리별 상품 조회
     @GetMapping
     public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false) Integer categoryId) {
         if (categoryId != null) {
-            // 프론트에서 ?categoryId=1 이라고 보내면 1번 카테고리만 리턴
             return ResponseEntity.ok(productRepository.findByCategoryId(categoryId));
         }
-        // 아무것도 안 보내면 전체 상품 리턴
         return ResponseEntity.ok(productRepository.findAll());
     }
-    // 🌟 2. 상품 등록을 처리하는 POST 메서드 추가
+
+    // 🌟 상품 등록 API
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
-        // 프론트에서 받은 데이터를 Product 엔티티에 세팅
+    public ResponseEntity<Product> createProduct(@RequestBody ProductRequest request) {
         Product product = new Product();
         product.setCategoryId(request.categoryId());
         product.setName(request.name());
         product.setPrice(BigDecimal.valueOf(request.price()));
-
-        // 데이터베이스 컬럼명이나 엔티티 설정에 따라 세팅 메서드가 다를 수 있습니다.
-        // 기존 Product 엔티티에 있는 필드명과 맞춰주세요!
         product.setStockQuantity(request.stockQuantity());
         product.setDescription(request.description());
-        product.setImageUrl(request.imageUrl());
 
-        // DB에 저장
-        productRepository.save(product);
+        // 🌟 여러 장의 이미지를 저장
+        product.setImageUrls(request.imageUrls());
 
-        return ResponseEntity.ok("상품이 성공적으로 등록되었습니다.");
+        Product savedProduct = productRepository.save(product);
+        return ResponseEntity.ok(savedProduct);
     }
+
+    // 🌟 개별 상품 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = productRepository.findById(Math.toIntExact(id))
+    public ResponseEntity<Product> getProduct(@PathVariable Integer id) {
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품을 찾을 수 없습니다. ID: " + id));
         return ResponseEntity.ok(product);
     }
 
     // 📦 상품 수정 API (판매자용)
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestBody Product productDetails) {
+    public ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestBody ProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
         // 내용 업데이트
-        product.setName(productDetails.getName());
-        product.setPrice(productDetails.getPrice());
-        product.setStockQuantity(productDetails.getStockQuantity());
-        product.setDescription(productDetails.getDescription());
-        product.setImageUrl(productDetails.getImageUrl());
+        product.setCategoryId(request.categoryId());
+        product.setName(request.name());
+        product.setPrice(BigDecimal.valueOf(request.price()));
+        product.setStockQuantity(request.stockQuantity());
+        product.setDescription(request.description());
+
+        // 🌟 수정 시에도 이미지 리스트로 덮어쓰기
+        product.setImageUrls(request.imageUrls());
 
         Product updatedProduct = productRepository.save(product);
         return ResponseEntity.ok(updatedProduct);
@@ -90,13 +89,9 @@ public class ProductController {
             return ResponseEntity.ok("상품이 성공적으로 삭제되었습니다.");
 
         } catch (DataIntegrityViolationException e) {
-            // DB에서 "주문 내역이 있어서 못 지워!" 라고 할 때
             return ResponseEntity.status(400).body("누군가 장바구니에 담았거나 이미 결제된 상품은 삭제할 수 없습니다. (품절 처리를 이용해주세요!)");
-
         } catch (Exception e) {
-            // 그 외 알 수 없는 에러
             return ResponseEntity.status(500).body("상품 삭제 중 오류가 발생했습니다.");
         }
     }
-
 }

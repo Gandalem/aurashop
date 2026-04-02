@@ -11,8 +11,10 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // 🌟 수량 관리를 위한 상태 추가 (기본값 1)
     const [quantity, setQuantity] = useState(1);
+
+    // 🌟 1. 현재 보여지는 메인 이미지의 순서(인덱스)를 기억하는 상태
+    const [currentImgIndex, setCurrentImgIndex] = useState(0);
 
     useEffect(() => {
         api.get(`/products/${id}`)
@@ -26,71 +28,101 @@ const ProductDetail = () => {
             });
     }, [id]);
 
-    // 🌟 2. useEffect 바로 아래, 로딩 처리하는 부분 덮어쓰기!
-    // 🚨 기존: if (loading) return <div className="loading">Loading...</div>;
-    if (loading) return <Spinner />; // 👈 빙글빙글 예쁜 스피너로 교체!
+    if (loading) return <Spinner />;
     if (!product) return <div className="error">상품을 찾을 수 없습니다.</div>;
 
-    // 🌟 3. 장바구니에 담기 함수 덮어쓰기!
+    // 🌟 2. 여러 장의 이미지를 배열로 만듭니다.
+    // (나중에 백엔드에서 imageUrls라는 배열로 보내주면 그걸 쓰고, 지금은 임시로 3장의 이미지를 만듭니다)
+    const images = product.imageUrls ? product.imageUrls : [
+        product.imageUrl, // 1번: 진짜 등록한 이미지
+        "https://via.placeholder.com/600x600?text=Detail+Image+2", // 2번: 가짜 이미지 (테스트용)
+        "https://via.placeholder.com/600x600?text=Detail+Image+3"  // 3번: 가짜 이미지 (테스트용)
+    ].filter(Boolean); // 빈 값(null) 제거
+
+    // 🌟 3. 좌우 화살표 클릭 시 이미지 넘기기 함수
+    const handlePrevImage = () => {
+        setCurrentImgIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+    };
+
+    const handleNextImage = () => {
+        setCurrentImgIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
+    };
+
+    const increaseQuantity = () => {
+        if (quantity < product.stockQuantity) setQuantity(quantity + 1);
+    };
+
+    const decreaseQuantity = () => {
+        if (quantity > 1) setQuantity(quantity - 1);
+    };
+
     const handleAddToCart = () => {
-        // 🚨 앗, 여긴 'token'으로 되어있었네요! 다른 파일들과 동일하게 'accessToken'으로 맞춰줍니다.
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken'); // token -> accessToken 통일
 
-        // 1. 로그인 여부 확인
         if (!token) {
-            toast.error('로그인이 필요한 서비스입니다. 😢'); // 👈 변경
-            setTimeout(() => {
-                navigate('/signin');
-            }, 1500);
+            toast.error('로그인이 필요한 서비스입니다. 😢');
+            setTimeout(() => navigate('/signin'), 1500);
             return;
         }
 
-        // 2. 재고 확인
         if (quantity > product.stockQuantity) {
-            toast.warning(`현재 남은 수량(${product.stockQuantity}개)까지만 담을 수 있습니다. 📦`); // 👈 변경
+            toast.warning(`현재 남은 수량(${product.stockQuantity}개)까지만 담을 수 있습니다. 📦`);
             return;
         }
 
-        // 3. API 호출
         api.post('http://localhost:8080/api/cart',
             { productId: product.id, quantity: quantity },
             { headers: { Authorization: `Bearer ${token}` } }
         )
             .then(response => {
-                toast.success('장바구니에 상품이 담겼습니다! 🛒'); // 👈 변경
+                toast.success('장바구니에 상품이 담겼습니다! 🛒');
             })
             .catch(error => {
                 console.error("장바구니 담기 오류", error);
-                toast.error('장바구니 담기에 실패했습니다. 😭'); // 👈 추가
+                toast.error('장바구니 담기에 실패했습니다. 😭');
             });
     };
 
-    // 수량 증가/감소 핸들러
-    const increaseQuantity = () => {
-        if (quantity < product.stockQuantity) {
-            setQuantity(prev => prev + 1);
-        }
-    };
-
-    const decreaseQuantity = () => {
-        if (quantity > 1) {
-            setQuantity(prev => prev - 1);
-        }
-    };
-
-    if (loading) return <div className="loading">Loading...</div>;
-    if (!product) return <div className="error">상품을 찾을 수 없습니다.</div>;
-
     return (
         <div className="product-detail-container">
-            <div className="product-detail-image">
-                {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name} />
+
+            {/* 🌟 4. 쇼핑몰 스타일의 이미지 갤러리 영역 */}
+            <div className="product-gallery">
+                {images.length > 0 ? (
+                    <>
+                        {/* 메인 큰 이미지 */}
+                        <div className="main-viewer">
+                            <img src={images[currentImgIndex]} alt={`${product.name} 상세이미지`} />
+                        </div>
+
+                        {/* 하단 썸네일 & 화살표 */}
+                        {images.length > 1 && (
+                            <div className="thumbnail-nav">
+                                <button className="nav-btn prev" onClick={handlePrevImage}>◀</button>
+
+                                <ul className="thumbnail-list">
+                                    {images.map((img, idx) => (
+                                        <li
+                                            key={idx}
+                                            className={`thumb-item ${idx === currentImgIndex ? 'active' : ''}`}
+                                            onMouseEnter={() => setCurrentImgIndex(idx)} // 👈 마우스만 올려도 바뀌게 하려면 추가
+                                            onClick={() => setCurrentImgIndex(idx)}
+                                        >
+                                            <img src={img} alt={`썸네일 ${idx + 1}`} />
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <button className="nav-btn next" onClick={handleNextImage}>▶</button>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="no-image-large">No Image</div>
                 )}
             </div>
 
+            {/* 오른쪽 상품 정보 영역 (기존과 동일) */}
             <div className="product-detail-info">
                 <h2>{product.name}</h2>
                 <p className="price">{product.price.toLocaleString()}원</p>
@@ -101,14 +133,12 @@ const ProductDetail = () => {
 
                 <p className="stock">남은 수량 : {product.stockQuantity}개</p>
 
-                {/* 🌟 수량 조절 UI 추가 */}
                 <div className="quantity-control">
                     <button onClick={decreaseQuantity} disabled={quantity <= 1}>-</button>
                     <span>{quantity}</span>
                     <button onClick={increaseQuantity} disabled={quantity >= product.stockQuantity}>+</button>
                 </div>
 
-                {/* 🌟 클릭 이벤트 추가 및 재고가 0일 경우 버튼 비활성화 */}
                 <button
                     className="add-to-cart-large-btn"
                     onClick={handleAddToCart}

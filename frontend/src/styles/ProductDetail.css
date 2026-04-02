@@ -132,3 +132,96 @@
 .add-to-cart-large-btn:disabled {
     cursor: not-allowed;
 }
+
+/* =========================================
+   쇼핑몰 상세페이지 이미지 갤러리 스타일
+========================================= */
+.product-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* 메인 큰 이미지 뷰어 */
+.main-viewer {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* 정사각형 비율 */
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fcfcfc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-viewer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 잘리지 않게 하려면 contain 사용 가능 */
+}
+
+/* 하단 썸네일 및 화살표 영역 */
+.thumbnail-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+}
+
+/* 썸네일 리스트 */
+.thumbnail-list {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 개별 썸네일 아이템 */
+.thumb-item {
+    width: 60px;
+    height: 60px;
+    border: 2px solid transparent; /* 기본 테두리 투명 */
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: hidden;
+    opacity: 0.6; /* 선택되지 않은 건 살짝 흐리게 */
+    transition: all 0.2s ease;
+}
+
+/* 현재 보고 있는 이미지 썸네일 강조 (on 클래스와 동일한 역할) */
+.thumb-item.active,
+.thumb-item:hover {
+    border-color: #333; /* 검은색 테두리 */
+    opacity: 1; /* 선명하게 */
+}
+
+.thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 좌우 화살표 버튼 */
+.nav-btn {
+    background-color: transparent;
+    color: #999;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 30px;
+    height: 60px; /* 썸네일과 높이 맞춤 */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}
