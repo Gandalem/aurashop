@@ -20,6 +20,7 @@ public class ProductController {
 
     // 🌟 1. 프론트엔드에서 보낸 상품 데이터를 담을 그릇 (DTO) 생성
     public record ProductRequest(
+            Integer categoryId, // 🌟 카테고리 ID 추가!
             String name,
             Double price,
             Integer stockQuantity,
@@ -27,17 +28,22 @@ public class ProductController {
             String imageUrl
     ) {}
 
-    // (기존에 있던 상품 전체 조회 메서드 - 그대로 둡니다)
+    // 🌟 GET: 전체 또는 카테고리별 상품 조회로 변경!
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false) Integer categoryId) {
+        if (categoryId != null) {
+            // 프론트에서 ?categoryId=1 이라고 보내면 1번 카테고리만 리턴
+            return ResponseEntity.ok(productRepository.findByCategoryId(categoryId));
+        }
+        // 아무것도 안 보내면 전체 상품 리턴
+        return ResponseEntity.ok(productRepository.findAll());
     }
-
     // 🌟 2. 상품 등록을 처리하는 POST 메서드 추가
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
         // 프론트에서 받은 데이터를 Product 엔티티에 세팅
         Product product = new Product();
+        product.setCategoryId(request.categoryId());
         product.setName(request.name());
         product.setPrice(BigDecimal.valueOf(request.price()));
 

@@ -4,6 +4,7 @@ import '../styles/ProductRegister.css';
 
 const ProductRegister = () => {
     const [formData, setFormData] = useState({
+        categoryId: '1', // 🌟 기본값: 1 (WOMEN)
         name: '',
         price: '',
         stockQuantity: '',
@@ -97,7 +98,21 @@ const ProductRegister = () => {
                             required
                         />
                     </div>
-
+                    {/* 🌟 카테고리 선택 드롭다운 추가 */}
+                    <div className="input-group">
+                        <label htmlFor="categoryId">카테고리 (Category)</label>
+                        <select
+                            id="categoryId"
+                            name="categoryId"
+                            value={formData.categoryId}
+                            onChange={handleChange}
+                            style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ddd' }}
+                        >
+                            <option value="1">WOMEN</option>
+                            <option value="2">MEN</option>
+                            <option value="3">ACCESSORIES</option>
+                        </select>
+                    </div>
                     <div className="input-group">
                         <label htmlFor="price">가격 (Price) *</label>
                         <input

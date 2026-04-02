@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import '../styles/Navigation.css';
 
 const Navigation = () => {
@@ -19,7 +21,6 @@ const Navigation = () => {
     }, []);
 
     const handleLogout = () => {
-        // 🚨 수정됨: 지울 때도 'accessToken'을 지우도록 변경!
         localStorage.removeItem('accessToken');
         localStorage.removeItem('role');
         localStorage.removeItem('userName');
@@ -27,8 +28,14 @@ const Navigation = () => {
         setIsLoggedIn(false);
         setIsSeller(false);
 
-        alert('로그아웃 되었습니다.');
-        window.location.href = '/';
+        // 🚨 기존의 투박한 alert 대신 예쁜 toast.success 사용!
+        toast.success('성공적으로 로그아웃 되었습니다! 👋');
+
+        // (참고: window.location.href로 바로 새로고침하면 알림이 안 보일 수 있으니
+        // setTimeout을 주거나, react-router-dom의 useNavigate를 쓰는 것이 좋습니다.)
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1500); // 1.5초 뒤에 메인으로 이동
     };
 
     return (
@@ -36,27 +43,30 @@ const Navigation = () => {
             <div className="navbar-container">
 
                 <div className="navbar-logo">
-                    <a href="/">AURA</a>
+                    {/* 로고는 메인으로 가도록 Link 처리 */}
+                    <Link to="/">AURA</Link>
                 </div>
 
                 <ul className="navbar-menu">
-                    <li><a href="/">NEW ARRIVALS</a></li>
-                    <li><a href="/">WOMEN</a></li>
-                    <li><a href="/">MEN</a></li>
-                    <li><a href="/">ACCESSORIES</a></li>
-                    <li><a href="/cs">CUSTOMER SERVICE</a></li>
+                    {/* 🌟 2. 각 카테고리별로 다른 주소(경로)를 지정해 줍니다. */}
+                    <li><Link to="/category/new">NEW ARRIVALS</Link></li>
+                    <li><Link to="/category/women">WOMEN</Link></li>
+                    <li><Link to="/category/men">MEN</Link></li>
+                    <li><Link to="/category/accessories">ACCESSORIES</Link></li>
+                    <li><Link to="/cs">CUSTOMER SERVICE</Link></li>
                 </ul>
 
                 <div className="navbar-icons">
-                    <a href="/cart" className="icon-link">CART</a>
+                    {/* 우측 아이콘들도 모두 Link로 변경! */}
+                    <Link to="/cart" className="icon-link">CART</Link>
 
                     {isLoggedIn ? (
                         <>
-                            <a href="/mypage" className="icon-link">MY PAGE</a>
+                            <Link to="/mypage" className="icon-link">MY PAGE</Link>
                             <button onClick={handleLogout} className="logout-btn">SIGN OUT</button>
                         </>
                     ) : (
-                        <a href="/signin" className="icon-link">SIGN IN</a>
+                        <Link to="/signin" className="icon-link">SIGN IN</Link>
                     )}
                 </div>
 

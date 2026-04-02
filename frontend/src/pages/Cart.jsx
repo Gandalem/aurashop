@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import '../styles/Cart.css';
+import Spinner from '../Spinner'; // 1. 스피너 임포트
 
 const Cart = () => {
     // 가짜 데이터 대신 빈 배열로 시작
@@ -16,15 +17,12 @@ const Cart = () => {
             return;
         }
 
-        api.get('http://localhost:8080/api/cart', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        api.get('http://localhost:8080/api/cart', { /* headers... */ })
             .then(response => {
                 setCartItems(response.data);
                 setLoading(false);
             })
             .catch(error => {
-                console.error("장바구니 조회 실패:", error);
                 setLoading(false);
             });
     }, []);
@@ -51,7 +49,8 @@ const Cart = () => {
 
     const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    if (loading) return <div style={{textAlign: 'center', marginTop: '50px'}}>Loading Cart...</div>;
+    // 2. 로딩 중일 때 스피너 반환
+    if (loading) return <Spinner />;
 
     return (
         <div className="cart-page">

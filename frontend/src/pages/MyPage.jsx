@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
+import Spinner from '../Spinner'; // 1. 스피너 임포트
 import '../styles/Mypage.css';
 
 const MyPage = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         // 🚨 1. 수정됨: 'token' 대신 'accessToken'을 꺼내오도록 변경!
@@ -19,18 +19,12 @@ const MyPage = () => {
 
         // 🚨 2. 수정됨: api.js에서 이미 'http://localhost:8080/api'를 기본 주소로
         // 설정해두었기 때문에 '/orders'만 적어주면 됩니다!
-        api.get('/orders', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        api.get('/orders', { /* headers... */ })
             .then(response => {
                 setOrders(response.data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error("주문 내역 조회 실패:", err);
-                setError("주문 내역을 불러오는 중 오류가 발생했습니다.");
                 setLoading(false);
             });
     }, []);
@@ -45,8 +39,8 @@ const MyPage = () => {
         });
     };
 
-    if (loading) return <div className="mypage-loading">주문 내역을 불러오는 중입니다...</div>;
-    if (error) return <div className="mypage-error">{error}</div>;
+    // 2. 기존의 "주문 내역을 불러오는 중..." 텍스트 대신 스피너 적용
+    if (loading) return <Spinner />;
 
     return (
         <div className="mypage-container">

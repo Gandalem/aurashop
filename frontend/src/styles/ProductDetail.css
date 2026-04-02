@@ -96,3 +96,39 @@
 .back-btn:hover {
     background-color: #f5f5f5;
 }
+/* --- 새로 추가할 수량 조절 스타일 --- */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    width: fit-content;
+    padding: 5px 15px;
+    border-radius: 4px;
+}
+
+.quantity-control button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #333;
+    padding: 5px 10px;
+}
+
+.quantity-control button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.quantity-control span {
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+.add-to-cart-large-btn:disabled {
+    cursor: not-allowed;
+}

@@ -1,304 +1,155 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api.js';
-// 🌟 CSS 파일 내부의 클래스 이름들도 .seller-... 로 변경해야 디자인이 적용됩니다.
+import Spinner from '../Spinner'; // 스피너 임포트
 import '../styles/SellerPage.css';
-import ProductRegister from "../pages/ProductRegister.jsx";
+import ProductRegister from "../pages/ProductRegister.jsx"; // 분리된 상품 등록 컴포넌트
 
 const SellerPage = () => {
     // 🌟 1. 현재 선택된 탭을 관리하는 상태 (기본값: 상품 등록)
     const [activeTab, setActiveTab] = useState('product-register');
+
+    // 🌟 주문 관리를 위한 상태
+    const [orders, setOrders] = useState([]);
+    const [loadingOrders, setLoadingOrders] = useState(false);
 
     // 🌟 2. 보안 체크: 진짜 판매자(SELLER)인지 확인
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         const role = localStorage.getItem('role');
 
-        // 🌟 SELLER가 아니면 판매자 전용 로그인 페이지로 쫓아내기!
+        // SELLER가 아니면 판매자 전용 로그인 페이지로 쫓아내기!
         if (!token || role !== 'SELLER') {
-            window.location.href = '/seller'; // 관리자 로그인 주소(/admin)가 아닌 판매자 로그인 주소로 변경
+            window.location.href = '/seller';
         }
-        // 실제 운영 시에는 백엔드 API를 호출하여 토큰의 유효성과 ROLE을 검증하는 것이 필수입니다.
     }, []);
 
-    // --- (상품 등록 관련 상태 및 함수들) ---
-    const [product, setProduct] = useState({ name: '', price: '', stockQuantity: '', description: '', imageUrl: '' });
-    const [loading, setLoading] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProduct({ ...product, [name]: value });
-    };
-
-    const handleProductSubmit = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const token = localStorage.getItem('accessToken');
-
-        api.post('http://localhost:8080/api/products', {
-            name: product.name,
-            price: Number(product.price),
-            stockQuantity: Number(product.stockQuantity),
-            description: product.description,
-            imageUrl: product.imageUrl
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(() => {
-                alert("상품이 성공적으로 등록되었습니다! 🎉");
-                setProduct({ name: '', price: '', stockQuantity: '', description: '', imageUrl: '' });
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("상품 등록 실패:", err);
-                alert("상품 등록 중 오류가 발생했습니다.");
-                setLoading(false);
-            });
-    };
-
-    // --- (상품 관리 관련 상태 및 함수들) ---
-    const [productList, setProductList] = useState([]);
-    const [editingProductId, setEditingProductId] = useState(null); // 현재 수정 중인 상품 ID
-    const [editForm, setEditForm] = useState({}); // 수정 폼 데이터
-
-    // 상품 관리 탭이 열릴 때마다 상품 목록 불러오기
+    // 🌟 3. 주문 관리 탭이 열릴 때 주문 목록 불러오기
     useEffect(() => {
-        if (activeTab === 'product-manage') {
-            fetchProducts();
+        if (activeTab === 'order-manage') {
+            fetchOrders();
         }
     }, [activeTab]);
 
-    const fetchProducts = () => {
-        api.get('http://localhost:8080/api/products')
-            .then(res => setProductList(res.data))
-            .catch(err => console.error("상품 불러오기 실패:", err));
-    };
-
-    // 상품 삭제 함수
-    const handleDeleteProduct = (id) => {
-        if (window.confirm("정말 이 상품을 삭제하시겠습니까?")) {
-            const token = localStorage.getItem('accessToken');
-            api.delete(`http://localhost:8080/api/products/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-                .then(() => {
-                    alert("삭제되었습니다.");
-                    fetchProducts(); // 목록 새로고침
-                })
-                .catch(err => {
-                    // 🌟 백엔드에서 보낸 친절한 에러 메시지를 화면에 띄워줍니다!
-                    if (err.response && err.response.data) {
-                        alert(err.response.data);
-                    } else {
-                        alert("삭제 실패!");
-                    }
-                });
-        }
-    };
-
-    // 수정 버튼 눌렀을 때 (수정 모드 ON)
-    const handleEditClick = (product) => {
-        setEditingProductId(product.id);
-        setEditForm(product); // 기존 데이터를 폼에 채워넣기
-    };
-
-    // 수정 완료 버튼 눌렀을 때 (백엔드로 전송)
-    const handleUpdateProduct = (id) => {
+    const fetchOrders = () => {
+        setLoadingOrders(true);
         const token = localStorage.getItem('accessToken');
-        api.put(`http://localhost:8080/api/products/${id}`, editForm, {
+
+        // 판매자용 주문 전체 조회 API 호출
+        api.get('/orders/seller', {
             headers: { Authorization: `Bearer ${token}` }
         })
-            .then(() => {
-                alert("상품이 수정되었습니다!");
-                setEditingProductId(null); // 수정 모드 OFF
-                fetchProducts(); // 목록 새로고침
+            .then(res => {
+                setOrders(res.data);
+                setLoadingOrders(false);
             })
-            .catch(err => alert("수정 실패!"));
+            .catch(err => {
+                console.error("주문 목록을 불러오는 중 오류 발생:", err);
+                setLoadingOrders(false);
+            });
     };
-    // ----------------------------------------------------
 
-    // ----------------------------------------------------
-
-
-    // 🌟 진짜 주문 데이터를 담을 빈 배열!
-    const [orders, setOrders] = useState([]);
-
-    // 🌟 탭이 'order-manage'로 바뀔 때 백엔드에서 모든 주문 데이터 불러오기
-    useEffect(() => {
-        if (activeTab === 'order-manage') {
-            const token = localStorage.getItem('accessToken');
-            api.get('http://localhost:8080/api/orders/seller', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-                .then(res => {
-                    setOrders(res.data); // DB에서 가져온 진짜 주문 데이터 세팅
-                })
-                .catch(err => {
-                    console.error("주문 목록 불러오기 실패:", err);
-                });
-        }
-    }, [activeTab]); // activeTab이 바뀔 때마다 실행
-
-    // 🌟 백엔드 DB의 배송 상태를 실제로 업데이트하는 함수
+    // 🌟 4. 주문 상태 변경 함수
     const handleStatusChange = (orderId, newStatus) => {
         const token = localStorage.getItem('accessToken');
 
-        api.put(`http://localhost:8080/api/orders/${orderId}/status`,
-            { status: newStatus }, // 변경할 영문 상태값 (PENDING, SHIPPED 등)
-            { headers: { Authorization: `Bearer ${token}` } }
-        )
+        api.put(`/orders/${orderId}/status`, { status: newStatus }, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then(() => {
-                // DB 변경이 성공하면 화면의 리스트도 새로고침 없이 변경!
-                setOrders(orders.map(order =>
-                    order.id === orderId ? { ...order, status: newStatus } : order
-                ));
-                alert(`✅ 주문번호 ${orderId} 상태가 변경되었습니다!`);
+                alert('주문 상태가 성공적으로 변경되었습니다.');
+                fetchOrders(); // 변경된 데이터로 새로고침
             })
             .catch(err => {
-                console.error("상태 변경 실패:", err);
-                alert("상태 변경 중 오류가 발생했습니다.");
+                console.error("상태 변경 오류:", err);
+                alert('상태 변경에 실패했습니다.');
             });
     };
 
     return (
-        // 🌟 클래스 이름을 seller-dashboard 로 변경
         <div className="seller-dashboard">
-            {/* 🌟 좌측 사이드바 메뉴 (클래스 이름 seller-sidebar 로 변경) */}
+            {/* 좌측 사이드바 메뉴 */}
             <aside className="seller-sidebar">
-                <h3>⚙️ SELLER CENTER</h3>
+                <h3>SELLER CENTER</h3>
                 <ul>
                     <li
                         className={activeTab === 'product-register' ? 'active' : ''}
                         onClick={() => setActiveTab('product-register')}
                     >
-                        🛍️ 상품 등록
-                    </li>
-                    <li
-                        className={activeTab === 'product-manage' ? 'active' : ''}
-                        onClick={() => setActiveTab('product-manage')}
-                    >
-                        📦 상품 관리
+                        📦 상품 등록
                     </li>
                     <li
                         className={activeTab === 'order-manage' ? 'active' : ''}
                         onClick={() => setActiveTab('order-manage')}
                     >
-                        🚚 주문/배송 관리
+                        🛒 주문 관리
                     </li>
-                    {/* 🌟 회원 관리 메뉴 삭제됨 */}
                 </ul>
             </aside>
 
-            {/* 🌟 우측 메인 콘텐츠 영역 (클래스 이름 seller-content 로 변경) */}
+            {/* 우측 메인 콘텐츠 영역 */}
             <main className="seller-content">
+
+                {/* 탭 1: 상품 등록 */}
                 {activeTab === 'product-register' && (
-                    // 🌟 클래스 이름 seller-panel, seller-form 으로 변경
-                    <div className="seller-panel">
-                        <ProductRegister /> {/* 🌟 예전 페이지를 부품처럼 쏙 끼워넣기! */}
+                    <div className="tab-pane">
+                        <ProductRegister />
                     </div>
                 )}
 
-                {activeTab === 'product-manage' && (
-                    <div className="admin-panel">
-                        <h2>📦 상품 관리</h2>
-                        <p>등록된 상품을 수정하거나 삭제할 수 있습니다.</p>
-
-                        <table className="order-table">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>상품명</th>
-                                <th>가격</th>
-                                <th>재고</th>
-                                <th>관리</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {productList.map(product => (
-                                <tr key={product.id}>
-                                    <td>{product.id}</td>
-
-                                    {/* 🌟 수정 모드일 때와 아닐 때를 다르게 보여줍니다 */}
-                                    {editingProductId === product.id ? (
-                                        <>
-                                            <td><input type="text" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} /></td>
-                                            <td><input type="number" value={editForm.price} onChange={(e) => setEditForm({...editForm, price: e.target.value})} /></td>
-                                            <td><input type="number" value={editForm.stockQuantity} onChange={(e) => setEditForm({...editForm, stockQuantity: e.target.value})} /></td>
-                                            <td>
-                                                <button onClick={() => handleUpdateProduct(product.id)} className="save-btn">저장</button>
-                                                <button onClick={() => setEditingProductId(null)} className="cancel-btn">취소</button>
-                                            </td>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <td>{product.name}</td>
-                                            <td>{product.price}원</td>
-                                            <td>{product.stockQuantity}개</td>
-                                            <td>
-                                                <button onClick={() => handleEditClick(product)} className="edit-btn">수정</button>
-                                                <button onClick={() => handleDeleteProduct(product.id)} className="delete-btn">삭제</button>
-                                            </td>
-                                        </>
-                                    )}
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {/* 🌟 수정된 주문/배송 관리 탭 */}
+                {/* 탭 2: 주문 관리 */}
                 {activeTab === 'order-manage' && (
-                    <div className="admin-panel">
-                        <h2>🚚 주문/배송 관리</h2>
-                        <p>고객들의 주문 내역을 확인하고 배송 상태를 업데이트하세요.</p>
+                    <div className="tab-pane">
+                        <h2>주문 관리</h2>
 
-                        <table className="order-table">
-                            <thead>
-                            <tr>
-                                <th>주문번호</th>
-                                <th>주문자 ID(Email)</th>
-                                <th>결제금액</th>
-                                <th>주문일시</th>
-                                <th>배송상태 (클릭해서 변경)</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {orders.length === 0 ? (
+                        {loadingOrders ? (
+                            <Spinner />
+                        ) : (
+                            <table className="order-table">
+                                <thead>
                                 <tr>
-                                    <td colSpan="5" style={{ padding: '30px', color: '#999' }}>아직 접수된 주문이 없습니다.</td>
+                                    <th>주문 번호</th>
+                                    <th>주소</th>
+                                    <th>총 금액</th>
+                                    <th>주문 일자</th>
+                                    <th>상태 변경</th>
                                 </tr>
-                            ) : (
-                                orders.map(order => (
-                                    <tr key={order.id}>
-                                        <td>{order.id}</td>
-                                        {/* 회원님의 Order 엔티티 구조에 맞춰 user.email 접근 */}
-                                        <td>{order.user?.email || '알수없음'}</td>
-                                        <td>{order.totalAmount?.toLocaleString()}원</td>
-                                        <td>{new Date(order.orderDate).toLocaleString()}</td>
-                                        <td>
-                                            {/* DB에 저장되는 영문 상태(PENDING, SHIPPED, DELIVERED)에 맞춤 */}
-                                            <select
-                                                value={order.status}
-                                                onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                                className={`status-select ${
-                                                    order.status === 'PENDING' ? 'status-paid' :
-                                                        order.status === 'SHIPPED' ? 'status-shipping' : 'status-done'
-                                                }`}
-                                            >
-                                                <option value="PENDING">결제완료(대기)</option>
-                                                <option value="SHIPPED">배송중</option>
-                                                <option value="DELIVERED">배송완료</option>
-                                            </select>
-                                        </td>
+                                </thead>
+                                <tbody>
+                                {orders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5">들어온 주문 내역이 없습니다.</td>
                                     </tr>
-                                ))
-                            )}
-                            </tbody>
-                        </table>
+                                ) : (
+                                    orders.map(order => (
+                                        <tr key={order.id}>
+                                            <td>{order.id}</td>
+                                            <td>{order.shippingAddress}</td>
+                                            <td>{order.totalAmount?.toLocaleString()}원</td>
+                                            <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                                            <td>
+                                                {/* DB에 저장되는 영문 상태(PENDING, SHIPPED, DELIVERED)에 맞춤 */}
+                                                <select
+                                                    value={order.status}
+                                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                                    className={`status-select ${
+                                                        order.status === 'PENDING' ? 'status-paid' :
+                                                            order.status === 'SHIPPED' ? 'status-shipping' : 'status-done'
+                                                    }`}
+                                                >
+                                                    <option value="PENDING">결제완료(대기)</option>
+                                                    <option value="SHIPPED">배송중</option>
+                                                    <option value="DELIVERED">배송완료</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 )}
 
-                {/* 🌟 회원 관리 콘텐츠 영역 삭제됨 */}
             </main>
         </div>
     );

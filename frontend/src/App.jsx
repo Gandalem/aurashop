@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // 1. 네비게이션(상단 메뉴바) 컴포넌트 불러오기
 import Navigation from './components/Navigation';
 
@@ -24,6 +25,7 @@ function App() {
     return (
         <Router>
             <div className="App">
+                <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} />
                 <Navigation />
                 <div className="main-content">
                     <Routes>
@@ -33,6 +35,8 @@ function App() {
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/mypage" element={<MyPage />} />
                         <Route path="/signup" element={<SignUp />} />
+                        <Route path="/category/:category" element={<ProductList />} />
+                        <Route path="/products" element={<ProductList />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/seller" element={<SellerLogin />} />
                         <Route path="/seller/dashboard" element={<SellerPage />} />
