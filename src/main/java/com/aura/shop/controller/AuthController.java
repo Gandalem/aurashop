@@ -35,7 +35,27 @@ public class AuthController {
     // 1. 회원가입 API (기존과 동일)
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest request) {
-        // ... 기존 회원가입 로직 유지 ...
+        if (userRepository.existsByEmail(request.email())) {
+            return ResponseEntity.badRequest().body("이미 사용 중인 이메일입니다.");
+        }
+
+        User user = new User();
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setName(request.name());
+        user.setAddress(request.address());
+        user.setPhone(request.phone());
+
+        // 🌟 오직 판매자와 일반 회원만 가입 가능! (ADMIN은 가입 불가)
+        if ("SELLER".equals(request.role())) {
+            user.setRole("SELLER");
+            user.setBusinessNumber(request.businessNumber());
+        } else {
+            user.setRole("USER");
+        }
+
+        userRepository.save(user);
+
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 

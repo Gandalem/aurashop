@@ -42,7 +42,7 @@ const CustomerCenter = () => {
         e.preventDefault();
         if (!newNotice.title || !newNotice.content) return alert('제목과 내용을 입력해주세요!');
 
-        const token = localStorage.getItem('token'); // 👈 신분증(토큰) 꺼내기
+        const token = localStorage.getItem('accessToken'); // 👈 신분증(토큰) 꺼내기
 
         api.post('/notices', newNotice, {
             headers: { Authorization: `Bearer ${token}` } // 👈 봉투(헤더)에 신분증 첨부!
@@ -64,7 +64,7 @@ const CustomerCenter = () => {
         if (!newQuestion.title || !newQuestion.content) return alert('제목과 내용을 입력해주세요!');
 
         const authorName = localStorage.getItem('userName') || '익명 사용자';
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
         api.post('/qna', { ...newQuestion, author: authorName }, {
             headers: { Authorization: `Bearer ${token}` } // 👈 헤더에 신분증 첨부!
@@ -85,7 +85,7 @@ const CustomerCenter = () => {
         e.preventDefault();
         if (!answerContent) return alert('답변 내용을 입력해주세요!');
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
         api.put(`/qna/${currentAnswerId}/answer`, { answer: answerContent }, {
             headers: { Authorization: `Bearer ${token}` } // 👈 헤더에 신분증 첨부!
