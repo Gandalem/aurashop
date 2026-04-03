@@ -91,7 +91,11 @@ const ProductList = () => {
                              onClick={() => navigate(`/product/${product.id}`)}
                              style={{ cursor: 'pointer' }}>
                             <div className="image-placeholder">
-                                {product.imageUrl ? (
+                                {product.imageUrls && product.imageUrls.length > 0 ? (
+                                    // 여러 장 등록된 이미지 중 첫 번째[0] 이미지를 썸네일로 사용!
+                                    <img src={product.imageUrls[0]} alt={product.name} />
+                                ) : product.imageUrl ? (
+                                    // 혹시 예전에 단일 이미지로 등록해둔 상품이 있을 경우를 위한 대비책
                                     <img src={product.imageUrl} alt={product.name} />
                                 ) : (
                                     <div className="no-image">No Image</div>
