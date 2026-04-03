@@ -9,8 +9,12 @@ COPY . .
 RUN npm run build
 
 FROM nginx:stable-alpine
+
+# 🌟 추가된 핵심 코드: 우리가 만든 설정 파일을 Nginx 기본 설정으로 덮어씌웁니다!
+COPY default.conf /etc/nginx/conf.d/default.conf
+
 # Vite의 기본 빌드 결과물 폴더는 'dist'인 경우가 많습니다.
-# 만약 빌드 후 화면이 안 뜨면 아래 경로를 'dist'로 바꿔보세요.
 COPY --from=build /app/dist /usr/share/nginx/html
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
