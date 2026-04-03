@@ -3,13 +3,14 @@ import api from '../api';
 import '../styles/ProductRegister.css';
 
 const ProductRegister = () => {
+    // 🌟 1. imageUrl을 삭제하고 imageUrls: [] 로 변경
     const [formData, setFormData] = useState({
-        categoryId: '1', // 🌟 기본값: 1 (WOMEN)
+        categoryId: '1',
         name: '',
         price: '',
         stockQuantity: '',
         description: '',
-        imageUrl: ''
+        imageUrls: []
     });
 
     const [loading, setLoading] = useState(false);
@@ -22,11 +23,13 @@ const ProductRegister = () => {
             [name]: value
         });
     };
+
+    // 🌟 2. 안전하게 작성된 이미지 업로드 함수
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const formDataFile = new FormData(); // 💡 위쪽의 formData 상태와 이름이 겹치지 않게 변경
+        const formDataFile = new FormData();
         formDataFile.append('file', file);
 
         const token = localStorage.getItem('accessToken');
@@ -38,14 +41,33 @@ const ProductRegister = () => {
             }
         })
             .then(res => {
+                const newImageUrl = typeof res.data === 'string' ? res.data : res.data.imageUrl;
+
+                if (!newImageUrl) {
+                    alert("이미지 주소를 받아오지 못했습니다.");
+                    return;
+                }
+
                 alert("사진 업로드 성공! 📸");
-                // 🚨 수정된 부분: setProduct 대신 setFormData 사용!
-                setFormData({ ...formData, imageUrl: res.data });
+
+                // 기존 배열에 새 이미지 주소 추가
+                setFormData(prev => ({
+                    ...prev,
+                    imageUrls: [...(prev.imageUrls || []), newImageUrl]
+                }));
             })
             .catch(err => {
-                console.error(err);
-                alert("사진 업로드 중 오류가 발생했습니다.");
+                console.error("이미지 업로드 실패:", err);
+                alert("이미지 업로드에 실패했습니다. 😭");
             });
+    };
+
+    // 🌟 3. X 버튼 누르면 삭제되는 기능
+    const handleRemoveImage = (indexToRemove) => {
+        setFormData(prev => ({
+            ...prev,
+            imageUrls: (prev.imageUrls || []).filter((_, index) => index !== indexToRemove)
+        }));
     };
 
     const handleSubmit = (e) => {
@@ -54,27 +76,17 @@ const ProductRegister = () => {
         setError(null);
 
         const token = localStorage.getItem('accessToken');
-        if (!token) {
-            alert("로그인이 필요한 서비스입니다.");
-            window.location.href = '/signin';
-            return;
-        }
 
-        // 백엔드의 상품 등록 API 호출 (판매자 권한이 있는 토큰만 통과될 것입니다)
         api.post('http://localhost:8080/api/products', formData, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+            headers: { Authorization: `Bearer ${token}` }
         })
-            .then(response => {
-                alert("상품이 성공적으로 등록되었습니다!");
-                window.location.href = '/'; // 메인 화면(상품 목록)으로 이동
+            .then(res => {
+                alert('상품이 성공적으로 등록되었습니다! 🎉');
+                window.location.href = '/seller/dashboard';
             })
             .catch(err => {
-                console.error("상품 등록 실패:", err);
-                // 권한이 없거나(403) 에러가 발생했을 때
-                const errorMessage = err.response?.data?.message || "상품 등록에 실패했습니다. 판매자 계정으로 로그인되어 있는지 확인해 주세요.";
-                setError(errorMessage);
+                console.error("상품 등록 오류:", err);
+                setError('상품 등록 중 오류가 발생했습니다.');
                 setLoading(false);
             });
     };
@@ -82,84 +94,64 @@ const ProductRegister = () => {
     return (
         <div className="product-register-container">
             <div className="register-box">
-                <h2>ADD NEW PRODUCT</h2>
-                <p>AURA 스토어에 새로운 상품을 등록합니다.</p>
+                <h2>📦 REGISTER PRODUCT</h2>
+                <p>새로운 상품을 등록해 주세요.</p>
 
-                <form onSubmit={handleSubmit} className="register-form">
+                <form className="register-form" onSubmit={handleSubmit}>
                     <div className="input-group">
-                        <label htmlFor="name">상품명 (Product Name) *</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="예: Classic White T-Shirt"
-                            required
-                        />
-                    </div>
-                    {/* 🌟 카테고리 선택 드롭다운 추가 */}
-                    <div className="input-group">
-                        <label htmlFor="categoryId">카테고리 (Category)</label>
-                        <select
-                            id="categoryId"
-                            name="categoryId"
-                            value={formData.categoryId}
-                            onChange={handleChange}
-                            style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ddd' }}
-                        >
+                        <label>카테고리</label>
+                        <select name="categoryId" value={formData.categoryId} onChange={handleChange}>
                             <option value="1">WOMEN</option>
                             <option value="2">MEN</option>
                             <option value="3">ACCESSORIES</option>
                         </select>
                     </div>
+
                     <div className="input-group">
-                        <label htmlFor="price">가격 (Price) *</label>
-                        <input
-                            type="number"
-                            id="price"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            placeholder="예: 29.99 (숫자만 입력)"
-                            min="0"
-                            step="0.01"
-                            required
-                        />
+                        <label>상품명</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
                     </div>
 
                     <div className="input-group">
-                        <label htmlFor="stockQuantity">재고 수량 (Stock Quantity) *</label>
-                        <input
-                            type="number"
-                            id="stockQuantity"
-                            name="stockQuantity"
-                            value={formData.stockQuantity}
-                            onChange={handleChange}
-                            placeholder="예: 100"
-                            min="1"
-                            required
-                        />
+                        <label>가격 (원)</label>
+                        <input type="number" name="price" value={formData.price} onChange={handleChange} required />
                     </div>
 
-                    <div className="form-group">
-                        <label>상품 이미지 업로드</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                        />
-                        {/* 🚨 수정된 부분: product.imageUrl -> formData.imageUrl */}
-                        {formData.imageUrl && (
-                            <div style={{ marginTop: '10px' }}>
-                                <p style={{ fontSize: '13px', color: 'green' }}>✅ 업로드 완료!</p>
-                                <img src={formData.imageUrl} alt="미리보기" style={{ width: '150px', borderRadius: '8px' }} />
+                    <div className="input-group">
+                        <label>재고 수량 (개)</label>
+                        <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleChange} required />
+                    </div>
+
+                    {/* 🌟 4. 다중 이미지 업로드 및 미리보기 UI */}
+                    <div className="input-group">
+                        <label>상품 이미지 업로드 (여러 장 등록 가능)</label>
+                        <input type="file" accept="image/*" onChange={handleImageUpload} />
+
+                        {formData.imageUrls && formData.imageUrls.length > 0 && (
+                            <div style={{ marginTop: '15px' }}>
+                                <p style={{ fontSize: '12px', color: 'green', marginBottom: '8px' }}>
+                                    ✅ 등록된 이미지 ({formData.imageUrls.length}장)
+                                </p>
+                                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                    {formData.imageUrls.map((url, index) => (
+                                        <div key={index} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                                            <img src={url} alt={`미리보기 ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }} />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveImage(index)}
+                                                style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#d9534f', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px' }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
 
                     <div className="input-group">
-                        <label htmlFor="description">상품 설명 (Description)</label>
+                        <label htmlFor="description">상품 설명</label>
                         <textarea
                             id="description"
                             name="description"
@@ -172,11 +164,7 @@ const ProductRegister = () => {
 
                     {error && <div className="error-message">{error}</div>}
 
-                    <button
-                        type="submit"
-                        className="register-btn"
-                        disabled={loading}
-                    >
+                    <button type="submit" className="register-btn" disabled={loading}>
                         {loading ? '등록 중...' : 'REGISTER PRODUCT'}
                     </button>
                 </form>

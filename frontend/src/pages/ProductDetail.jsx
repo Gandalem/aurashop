@@ -10,10 +10,9 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
-
     const [quantity, setQuantity] = useState(1);
 
-    // 🌟 1. 현재 보여지는 메인 이미지의 순서(인덱스)를 기억하는 상태
+    // 🌟 1. 현재 보여지는 이미지의 순서를 기억하는 상태
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
 
     useEffect(() => {
@@ -31,22 +30,15 @@ const ProductDetail = () => {
     if (loading) return <Spinner />;
     if (!product) return <div className="error">상품을 찾을 수 없습니다.</div>;
 
-    // 🌟 2. 여러 장의 이미지를 배열로 만듭니다.
-    // (나중에 백엔드에서 imageUrls라는 배열로 보내주면 그걸 쓰고, 지금은 임시로 3장의 이미지를 만듭니다)
-    const images = product.imageUrls ? product.imageUrls : [
-        product.imageUrl, // 1번: 진짜 등록한 이미지
-        "https://via.placeholder.com/600x600?text=Detail+Image+2", // 2번: 가짜 이미지 (테스트용)
-        "https://via.placeholder.com/600x600?text=Detail+Image+3"  // 3번: 가짜 이미지 (테스트용)
-    ].filter(Boolean); // 빈 값(null) 제거
-
-    // 🌟 3. 좌우 화살표 클릭 시 이미지 넘기기 함수
-    const handlePrevImage = () => {
-        setCurrentImgIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
-    };
-
-    const handleNextImage = () => {
-        setCurrentImgIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
-    };
+    // 🌟 2. 여러 장의 이미지를 배열로 만들기
+    // (백엔드에서 여러 장(imageUrls)을 주면 그걸 쓰고, 아니면 기존 이미지(imageUrl)에 가짜 이미지를 더해서 보여줍니다)
+    const images = product.imageUrls && product.imageUrls.length > 0
+        ? product.imageUrls
+        : [
+            product.imageUrl, // 1번: 진짜 등록한 이미지
+            "https://via.placeholder.com/600x600?text=Detail+Image+2", // 2번: 가짜 이미지 (테스트용)
+            "https://via.placeholder.com/600x600?text=Detail+Image+3"  // 3번: 가짜 이미지 (테스트용)
+        ].filter(Boolean); // null이나 undefined 제거
 
     const increaseQuantity = () => {
         if (quantity < product.stockQuantity) setQuantity(quantity + 1);
@@ -57,8 +49,7 @@ const ProductDetail = () => {
     };
 
     const handleAddToCart = () => {
-        const token = localStorage.getItem('accessToken'); // token -> accessToken 통일
-
+        const token = localStorage.getItem('accessToken');
         if (!token) {
             toast.error('로그인이 필요한 서비스입니다. 😢');
             setTimeout(() => navigate('/signin'), 1500);
@@ -86,7 +77,7 @@ const ProductDetail = () => {
     return (
         <div className="product-detail-container">
 
-            {/* 🌟 4. 쇼핑몰 스타일의 이미지 갤러리 영역 */}
+            {/* 🌟 3. 쇼핑몰 스타일 갤러리 영역 */}
             <div className="product-gallery">
                 {images.length > 0 ? (
                     <>
@@ -95,25 +86,21 @@ const ProductDetail = () => {
                             <img src={images[currentImgIndex]} alt={`${product.name} 상세이미지`} />
                         </div>
 
-                        {/* 하단 썸네일 & 화살표 */}
+                        {/* 하단 썸네일 리스트 */}
                         {images.length > 1 && (
                             <div className="thumbnail-nav">
-                                <button className="nav-btn prev" onClick={handlePrevImage}>◀</button>
-
                                 <ul className="thumbnail-list">
                                     {images.map((img, idx) => (
                                         <li
                                             key={idx}
                                             className={`thumb-item ${idx === currentImgIndex ? 'active' : ''}`}
-                                            onMouseEnter={() => setCurrentImgIndex(idx)} // 👈 마우스만 올려도 바뀌게 하려면 추가
+                                            onMouseEnter={() => setCurrentImgIndex(idx)} // 마우스 올리면 바뀌게
                                             onClick={() => setCurrentImgIndex(idx)}
                                         >
                                             <img src={img} alt={`썸네일 ${idx + 1}`} />
                                         </li>
                                     ))}
                                 </ul>
-
-                                <button className="nav-btn next" onClick={handleNextImage}>▶</button>
                             </div>
                         )}
                     </>
@@ -122,7 +109,6 @@ const ProductDetail = () => {
                 )}
             </div>
 
-            {/* 오른쪽 상품 정보 영역 (기존과 동일) */}
             <div className="product-detail-info">
                 <h2>{product.name}</h2>
                 <p className="price">{product.price.toLocaleString()}원</p>
