@@ -9,7 +9,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/files")
-@CrossOrigin(origins = "http://localhost:5173")
 public class FileUploadController {
 
     // 🌟 이미지를 저장할 폴더 경로 (프로젝트 최상단에 'uploads' 라는 폴더가 자동 생성됩니다)
