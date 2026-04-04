@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import Spinner from '../Spinner';
 import { toast } from 'react-toastify'; // 🌟 1. 예쁜 알림창(Toast) 도구 불러오기
 import '../styles/SignIn.css';
@@ -16,7 +16,7 @@ const SignIn = () => {
         setError(null);
 
         // 백엔드의 진짜 로그인 API 호출!
-        axios.post('http://localhost:8080/api/auth/login', {
+        api.post('/auth/login', {
             email: email,
             password: password})
             .then(response => {

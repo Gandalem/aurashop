@@ -34,7 +34,7 @@ const ProductRegister = () => {
 
         const token = localStorage.getItem('accessToken');
 
-        api.post('http://localhost:8080/api/files/upload', formDataFile, {
+        api.post('/api/files/upload', formDataFile, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${token}`
@@ -77,7 +77,7 @@ const ProductRegister = () => {
 
         const token = localStorage.getItem('accessToken');
 
-        api.post('http://localhost:8080/api/products', formData, {
+        api.post('/api/products', formData, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => {

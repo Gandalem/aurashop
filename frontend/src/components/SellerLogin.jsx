@@ -19,7 +19,7 @@ const SellerLogin = () => {
     const handleSellerLogin = (e) => {
         e.preventDefault();
 
-        api.post('http://localhost:8080/api/auth/login', {
+        api.post('/api/auth/login', {
             email: email,
             password: password
         })

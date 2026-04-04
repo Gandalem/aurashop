@@ -16,7 +16,7 @@ const Checkout = () => {
         const token = localStorage.getItem('accessToken');
         if (token) {
             // 장바구니 목록을 불러오는 API (기존에 만드셨던 주소에 맞게 확인해주세요!)
-            api.get('http://localhost:8080/api/cart', {
+            api.get('/api/cart', {
                 headers: { Authorization: `Bearer ${token}` }
             })
                 .then(res => {
@@ -96,7 +96,7 @@ const Checkout = () => {
         IMP.request_pay(data, (response) => {
             if (response.success) {
                 // 🌟 2. 결제가 성공하면 비로소 백엔드로 주문 생성 요청 보내기
-                api.post('http://localhost:8080/api/orders',
+                api.post('/api/orders',
                     {
                         shippingAddress: shippingAddress
                     },

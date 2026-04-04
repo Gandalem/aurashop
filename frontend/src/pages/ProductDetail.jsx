@@ -61,7 +61,7 @@ const ProductDetail = () => {
             return;
         }
 
-        api.post('http://localhost:8080/api/cart',
+        api.post('/api/cart',
             { productId: product.id, quantity: quantity },
             { headers: { Authorization: `Bearer ${token}` } }
         )

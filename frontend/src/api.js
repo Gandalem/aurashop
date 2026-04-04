@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api', // 백엔드 주소
-    withCredentials: true, // 쿠키를 주고받기 위해 필수!
+    // 🌟 하드코딩 제거! Vite의 환경 변수를 불러옵니다.
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    withCredentials: true,
 });
 
 // 🚨 [새로 추가된 부분] 요청 인터셉터: API 요청을 보내기 직전에 토큰을 달아줍니다!

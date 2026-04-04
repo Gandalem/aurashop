@@ -27,8 +27,8 @@ const ProductList = () => {
 
         // 카테고리 ID가 있으면 필터링 주소로, 없으면 전체 상품 주소로 설정
         const fetchUrl = mappedCategoryId
-            ? `http://localhost:8080/api/products?categoryId=${mappedCategoryId}`
-            : 'http://localhost:8080/api/products';
+            ? `/api/products?categoryId=${mappedCategoryId}`
+            : '/api/products';
 
         api.get(fetchUrl)
             .then(response => {
@@ -58,7 +58,7 @@ const ProductList = () => {
             return;
         }
 
-        api.post('http://localhost:8080/api/cart',
+        api.post('/api/cart',
             { productId: productId, quantity: 1 },
             { headers: { Authorization: `Bearer ${token}` } }
         )

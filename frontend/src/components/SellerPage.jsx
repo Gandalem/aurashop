@@ -34,7 +34,7 @@ const SellerPage = () => {
         setLoading(true);
         const token = localStorage.getItem('accessToken');
 
-        api.post('http://localhost:8080/api/products', {
+        api.post('/api/products', {
             name: product.name,
             price: Number(product.price),
             stockQuantity: Number(product.stockQuantity),
@@ -68,7 +68,7 @@ const SellerPage = () => {
     }, [activeTab]);
 
     const fetchProducts = () => {
-        api.get('http://localhost:8080/api/products')
+        api.get('/api/products')
             .then(res => setProductList(res.data))
             .catch(err => console.error("상품 불러오기 실패:", err));
     };
@@ -77,7 +77,7 @@ const SellerPage = () => {
     const handleDeleteProduct = (id) => {
         if (window.confirm("정말 이 상품을 삭제하시겠습니까?")) {
             const token = localStorage.getItem('accessToken');
-            api.delete(`http://localhost:8080/api/products/${id}`, {
+            api.delete(`/api/products/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
                 .then(() => {
@@ -104,7 +104,7 @@ const SellerPage = () => {
     // 수정 완료 버튼 눌렀을 때 (백엔드로 전송)
     const handleUpdateProduct = (id) => {
         const token = localStorage.getItem('accessToken');
-        api.put(`http://localhost:8080/api/products/${id}`, editForm, {
+        api.put(`/api/products/${id}`, editForm, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(() => {
@@ -126,7 +126,7 @@ const SellerPage = () => {
     useEffect(() => {
         if (activeTab === 'order-manage') {
             const token = localStorage.getItem('accessToken');
-            api.get('http://localhost:8080/api/orders/seller', {
+            api.get('/api/orders/seller', {
                 headers: { Authorization: `Bearer ${token}` }
             })
                 .then(res => {
@@ -142,7 +142,7 @@ const SellerPage = () => {
     const handleStatusChange = (orderId, newStatus) => {
         const token = localStorage.getItem('accessToken');
 
-        api.put(`http://localhost:8080/api/orders/${orderId}/status`,
+        api.put(`/api/orders/${orderId}/status`,
             { status: newStatus }, // 변경할 영문 상태값 (PENDING, SHIPPED 등)
             { headers: { Authorization: `Bearer ${token}` } }
         )

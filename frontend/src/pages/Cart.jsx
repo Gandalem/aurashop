@@ -17,7 +17,7 @@ const Cart = () => {
             return;
         }
 
-        api.get('http://localhost:8080/api/cart', { /* headers... */ })
+        api.get('/api/cart', { /* headers... */ })
             .then(response => {
                 setCartItems(response.data);
                 setLoading(false);
@@ -30,7 +30,7 @@ const Cart = () => {
     // 🌟 삭제 기능도 API 연동 (앞서 백엔드에 만들어둔 DELETE API 호출)
     const handleRemove = (id) => {
         const token = localStorage.getItem('accessToken');
-        api.delete(`http://localhost:8080/api/cart/${id}`, {
+        api.delete(`/api/cart/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(() => {

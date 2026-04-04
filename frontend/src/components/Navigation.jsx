@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import api from '../api';
 import '../styles/Navigation.css';
 
 const Navigation = () => {
@@ -13,9 +14,42 @@ const Navigation = () => {
         const role = localStorage.getItem('role');
 
         if (token) {
-            setIsLoggedIn(true);
-            if (role === 'SELLER') {
-                setIsSeller(true);
+            try {
+                // 🌟 1. JWT 토큰의 뱃속(Payload)을 열어서 만료 시간을 확인합니다.
+                // (atob는 base64를 해독하는 브라우저 기본 함수입니다)
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const isExpired = payload.exp * 1000 < Date.now(); // 현재 시간과 비교
+
+                if (isExpired) {
+                    // 🌟 2. 토큰이 만료되었다면? 뒤에서 조용히 재발급을 요청합니다.
+                    // (api.js를 쓰면 무한 루프에 빠질 수 있으므로 순수 axios를 사용합니다)
+                    api.post('/api/auth/reissue', {}, {
+                        withCredentials: true // 쿠키(Refresh Token)를 담아서 보냄
+                    })
+                        .then(res => {
+                            // 성공적으로 새 토큰을 받아오면 교체하고 로그인 상태 유지!
+                            localStorage.setItem('accessToken', res.data.accessToken);
+                            setIsLoggedIn(true);
+                            if (role === 'SELLER') setIsSeller(true);
+                        })
+                        .catch(() => {
+                            // 🌟 3. 14일짜리 Refresh Token마저 만료되었다면?
+                            // 미련 없이 찌꺼기를 지우고 확실하게 로그아웃 상태로 만듭니다.
+                            localStorage.removeItem('accessToken');
+                            localStorage.removeItem('role');
+                            localStorage.removeItem('userName');
+                            setIsLoggedIn(false);
+                            setIsSeller(false);
+                        });
+                } else {
+                    // 아직 만료되지 않은 쌩쌩한 토큰이라면 바로 로그인 처리
+                    setIsLoggedIn(true);
+                    if (role === 'SELLER') setIsSeller(true);
+                }
+            } catch (error) {
+                // 토큰 형식이 이상하게 꼬였을 경우를 대비한 방어 로직
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('role');
             }
         }
     }, []);

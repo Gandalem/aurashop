@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import DaumPostcode from 'react-daum-postcode';
 import Spinner from '../Spinner';
 import { toast } from 'react-toastify'; // 🌟 1. 토스트 알림 임포트
 import '../styles/SignUp.css';
+import api from '../api';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -70,7 +70,7 @@ const SignUp = () => {
         try {
             const finalAddress = `[${addressObj.zonecode}] ${addressObj.mainAddress} ${addressObj.detailAddress}`;
 
-            await axios.post('http://localhost:8080/api/auth/signup', {
+            api.post('/auth/signup', {
                 email: formData.email,
                 password: formData.password,
                 name: formData.name,
